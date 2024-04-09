@@ -40,9 +40,11 @@ public class Channel extends BaseTimeEntity {
     @JoinColumn(name = "manager_id")
     private User manager;
 
-    @Builder
-    private Channel(User manager) {
-        this.manager = manager;
-    }
+    private String channelName;
 
+    @Builder
+    private Channel(User manager, String channelName) {
+        this.manager = manager;
+        this.channelName = channelName;
+    }
 }
