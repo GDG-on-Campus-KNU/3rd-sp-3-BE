@@ -1,8 +1,12 @@
 package gdsc.comunity.repository.user;
 
+import gdsc.comunity.entity.channel.Channel;
 
-import gdsc.comunity.entity.user.UserChannel;
-import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.Map;
 
-public interface UserChannelRepository extends JpaRepository<UserChannel, Long> {
+public interface UserChannelRepository {
+
+    Long getUserIdByNicknameAndChannel(String senderNickname, Channel channel);
+
+    Map<Long, String> getNicknameMapByChannelId(Long channelId);
 }
