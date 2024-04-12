@@ -1,6 +1,7 @@
 package gdsc.comunity.controller.chat;
 
 import gdsc.comunity.dto.chat.Chatting;
+import gdsc.comunity.dto.chat.PagingChatting;
 import gdsc.comunity.service.ChatService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

@@ -1,6 +1,5 @@
-package gdsc.comunity.controller.chat;
+package gdsc.comunity.dto.chat;
 
-import gdsc.comunity.dto.chat.Chatting;
 import gdsc.comunity.entity.chat.ChatLog;
 import org.springframework.data.domain.Page;
 

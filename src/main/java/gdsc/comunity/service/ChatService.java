@@ -1,6 +1,6 @@
 package gdsc.comunity.service;
 
-import gdsc.comunity.controller.chat.PagingChatting;
+import gdsc.comunity.dto.chat.PagingChatting;
 import gdsc.comunity.dto.chat.Chatting;
 import gdsc.comunity.entity.chat.ChatLog;
 import gdsc.comunity.repository.channel.ChannelRepository;
