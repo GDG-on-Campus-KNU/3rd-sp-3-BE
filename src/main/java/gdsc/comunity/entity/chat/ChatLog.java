@@ -10,13 +10,14 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
+import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Builder
 @Entity
 public class ChatLog extends BaseTimeEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,10 +33,6 @@ public class ChatLog extends BaseTimeEntity {
     @JoinColumn(name = "channel_id")
     private Channel channel;
 
-    @Builder
-    private ChatLog(Long senderId, String content, Channel channel) {
-        this.senderId = senderId;
-        this.content = content;
-        this.channel = channel;
-    }
+    @Column(nullable = false)
+    private LocalDateTime sendTime;
 }
