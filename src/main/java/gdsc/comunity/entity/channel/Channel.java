@@ -47,4 +47,8 @@ public class Channel extends BaseTimeEntity {
         this.manager = manager;
         this.channelName = channelName;
     }
+
+    public void updateManager(User newManager) {
+        this.manager = newManager;
+    }
 }

@@ -1,14 +1,15 @@
 package gdsc.comunity.service.channel;
 
+import gdsc.comunity.dto.channel.ChannelInfoDto;
 import gdsc.comunity.entity.channel.Channel;
 import gdsc.comunity.entity.user.User;
 
 public interface ChannelService {
-    Channel createChannel(User user, String channelName);
+    Channel createChannel(Long userId, String channelName);
 
-    void leaveChannel(User user);
+    void leaveChannel(Long userId, Long channelId);
 
-    void deleteChannel(User user);
+    void deleteChannel(Long userId, Long channelId);
 
-    Channel searchChannel(Long channelId);
+    ChannelInfoDto searchChannel(Long channelId);
 }
