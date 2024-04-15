@@ -34,7 +34,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         Claims claims = jwtProvider.validateToken(accessToken);
         log.info("claims: {}", claims);
         if (claims.get("isAccessToken", Boolean.class)) {
-            Long userId = claims.get("userId", Long.class);
+            log.info("isAccessToken: {}", claims.get("isAccessToken", Boolean.class));
+            log.info("userId: {}", claims.get("userId", String.class));
+
+            //Claim은 String, Integer, Boolean 저장 가능?
+            String userIdStr = claims.get("userId", String.class);
+            Long userId = Long.parseLong(userIdStr);
+
             UserPrincipal userPrincipal = new UserPrincipal(userId);
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                     userPrincipal, null, null); // 권한은 없음
