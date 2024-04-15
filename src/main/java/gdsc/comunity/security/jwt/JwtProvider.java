@@ -23,17 +23,24 @@ public class JwtProvider {
     }
 
     private String generateToken(Long userId, boolean isAccessToken){
+        Claims claims = Jwts.claims();
+        claims.put("userId", userId.toString());
+        claims.put("isAccessToken", isAccessToken);
+
         long expireTime = isAccessToken ? JwtVO.ACCESS_TOKEN_EXPIRATION_TIME : JwtVO.REFRESH_TOKEN_EXPIRATION_TIME;
         Date expireDate = new Date(System.currentTimeMillis() + expireTime);
+
         return Jwts.builder()
                 .signWith(SignatureAlgorithm.HS512, SECRET_KEY)
-                .claim("userId",userId.toString())
-                .claim("isAccessToken", isAccessToken)
+                .setClaims(claims)
                 .setExpiration(expireDate)
                 .compact();
     }
 
     public Claims validateToken(String token) {
-        return null; //TODO: token 검증
+        return Jwts.parser()
+                .setSigningKey(SECRET_KEY)
+                .parseClaimsJws(token)
+                .getBody();
     }
 }
