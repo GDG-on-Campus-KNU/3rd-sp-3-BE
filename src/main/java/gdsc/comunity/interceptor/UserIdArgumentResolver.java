@@ -1,6 +1,8 @@
 package gdsc.comunity.interceptor;
 
 import gdsc.comunity.annotation.UserId;
+import gdsc.comunity.exception.CustomException;
+import gdsc.comunity.exception.ErrorCode;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.support.WebDataBinderFactory;
@@ -27,7 +29,7 @@ public class UserIdArgumentResolver implements HandlerMethodArgumentResolver {
     ) {
         Object userIdObj = webRequest.getAttribute("userId", NativeWebRequest.SCOPE_REQUEST);
         if (userIdObj == null) {
-            //TODO: 예외 처리
+            throw new CustomException(ErrorCode.LOGIN_REQUIRED);
         }
         return Long.parseLong((String) userIdObj);
     }
