@@ -5,6 +5,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import java.util.Date;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -14,21 +15,33 @@ public class JwtProvider {
     private String SECRET_KEY;
 
     public JwtTokensDto generateTokens(Long userId) {
-        String accessToken = generateToken(userId, true);
-        String refreshToken = generateToken(userId, false);
+        String accessToken = generateAccessToken(userId);
+        String refreshToken = generateRefreshToken();
         return JwtTokensDto.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
     }
 
-    private String generateToken(Long userId, boolean isAccessToken){
+    private String generateRefreshToken() {
+        Claims claims = Jwts.claims();
+        claims.put("isAccessToken", true);
+
+        Date expireDate = new Date(System.currentTimeMillis() + JwtVO.REFRESH_TOKEN_EXPIRATION_TIME);
+
+        return Jwts.builder()
+                .signWith(SignatureAlgorithm.HS512, SECRET_KEY)
+                .setClaims(claims)
+                .setExpiration(expireDate)
+                .compact();
+    }
+
+    private String generateAccessToken(Long userId){
         Claims claims = Jwts.claims();
         claims.put("userId", userId.toString());
-        claims.put("isAccessToken", isAccessToken);
+        claims.put("isAccessToken", true);
 
-        long expireTime = isAccessToken ? JwtVO.ACCESS_TOKEN_EXPIRATION_TIME : JwtVO.REFRESH_TOKEN_EXPIRATION_TIME;
-        Date expireDate = new Date(System.currentTimeMillis() + expireTime);
+        Date expireDate = new Date(System.currentTimeMillis() + JwtVO.ACCESS_TOKEN_EXPIRATION_TIME);
 
         return Jwts.builder()
                 .signWith(SignatureAlgorithm.HS512, SECRET_KEY)
