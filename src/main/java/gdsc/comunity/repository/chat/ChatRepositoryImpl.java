@@ -19,6 +19,6 @@ public class ChatRepositoryImpl implements ChatRepository{
     @Override
     public Page<ChatLog> findChatLogByPage(Long channelId, int page) {
         PageRequest pageRequest = PageRequest.of(page, 50);
-        return chatLogJpaRepository.findAllByOrderBySendTimeDesc(pageRequest);
+        return chatLogJpaRepository.findAllByChannelIdOrderBySendTimeDesc(channelId, pageRequest);
     }
 }
