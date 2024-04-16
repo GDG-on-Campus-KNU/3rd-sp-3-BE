@@ -5,6 +5,8 @@ import gdsc.comunity.entity.user.Provider;
 import gdsc.comunity.entity.user.User;
 import gdsc.comunity.repository.user.UserRepository;
 import gdsc.comunity.security.jwt.JwtProvider;
+import gdsc.comunity.security.jwt.RefreshToken;
+import gdsc.comunity.security.jwt.RefreshTokenRepository;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -38,6 +40,7 @@ public class OAuthService {
             .baseUrl("https://www.googleapis.com/userinfo/v2/me")
             .build();
     private final UserRepository userRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     @Transactional
     public String getAccessToken(String code) {
@@ -87,6 +90,7 @@ public class OAuthService {
         // 유저가 존재하는지 확인
         String email = userInfo.get("email");
         Optional<User> userOP= userRepository.findByEmail(email);
+
         if (userOP.isEmpty()) {
             // 유저가 존재하지 않으면 회원가입
             User user = User.builder()
@@ -96,8 +100,20 @@ public class OAuthService {
                     .email(email)
                     .build();
             User savedUser = userRepository.save(user);
-            return jwtProvider.generateTokens(savedUser.getId());
+            JwtTokensDto jwtTokensDto = jwtProvider.generateTokens(savedUser.getId());
+            saveRefreshToken(savedUser.getId(), jwtTokensDto.refreshToken());
+            return jwtTokensDto;
         }
-        return jwtProvider.generateTokens(userOP.get().getId());
+
+        JwtTokensDto jwtTokensDto = jwtProvider.generateTokens(userOP.get().getId());
+        saveRefreshToken(userOP.get().getId(), jwtTokensDto.refreshToken());
+        return jwtTokensDto;
+    }
+
+    private void saveRefreshToken(Long userId, String refreshToken) {
+        refreshTokenRepository.save(RefreshToken.builder()
+                .userId(userId)
+                .refreshToken(refreshToken)
+                .build());
     }
 }
