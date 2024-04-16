@@ -16,7 +16,7 @@ public class UserChannelRepositoryImpl implements UserChannelRepository{
 
     @Override
     public Long getUserIdByNicknameAndChannel(String senderNickname, Channel channel) {
-        return userChannelJpaRepository.findUserIdByNicknameAndChannel(senderNickname, channel)
+        return userChannelJpaRepository.findUserIdByNicknameAndChannel(senderNickname, channel.getId())
                 .orElseThrow(() -> new IllegalArgumentException("해당 유저를 찾을 수 없습니다."));
     }
 
