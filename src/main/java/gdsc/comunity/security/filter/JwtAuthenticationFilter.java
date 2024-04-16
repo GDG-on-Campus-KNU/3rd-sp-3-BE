@@ -27,7 +27,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String bearerToken = request.getHeader("Authorization");
         if (bearerToken == null || !bearerToken.startsWith("Bearer ")) {
+            log.info("BearerToken is null or does not start with 'Bearer '");
+            log.info("bearerToken : {}", bearerToken);
             filterChain.doFilter(request, response);
+            return;
         }
         String accessToken = bearerToken.substring(7);
 
