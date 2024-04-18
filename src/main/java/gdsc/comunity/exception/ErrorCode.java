@@ -7,7 +7,8 @@ import org.springframework.http.HttpStatus;
 @Getter
 @AllArgsConstructor
 public enum ErrorCode {
-    LOGIN_REQUIRED(40100, HttpStatus.UNAUTHORIZED, "로그인이 필요합니다.");
+    LOGIN_REQUIRED(40100, HttpStatus.UNAUTHORIZED, "로그인이 필요합니다."),
+    INVALID_REFRESH_TOKEN_ERROR(40101, HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다.");
 
     private final int code;
     private final HttpStatus status;
