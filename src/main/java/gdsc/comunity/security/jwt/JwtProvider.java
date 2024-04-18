@@ -25,7 +25,7 @@ public class JwtProvider {
 
     private String generateRefreshToken() {
         Claims claims = Jwts.claims();
-        claims.put("isAccessToken", true);
+        claims.put("isAccessToken", false);
 
         Date expireDate = new Date(System.currentTimeMillis() + JwtVO.REFRESH_TOKEN_EXPIRATION_TIME);
 
