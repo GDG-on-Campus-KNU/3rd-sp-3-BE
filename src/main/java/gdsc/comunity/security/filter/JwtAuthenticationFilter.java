@@ -1,5 +1,7 @@
 package gdsc.comunity.security.filter;
 
+import gdsc.comunity.exception.CustomException;
+import gdsc.comunity.exception.ErrorCode;
 import gdsc.comunity.security.info.UserPrincipal;
 import gdsc.comunity.security.jwt.JwtProvider;
 import io.jsonwebtoken.Claims;
@@ -30,8 +32,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         String accessToken = bearerToken.substring(7);
-
-        Claims claims = jwtProvider.validateToken(accessToken);
+        Claims claims;
+        try {
+            claims = jwtProvider.validateToken(accessToken);
+        } catch (Exception e) {
+            throw new CustomException(ErrorCode.INVALID_ACCESS_TOKEN_ERROR);
+        }
         if (claims.get("isAccessToken", Boolean.class)) {
             //Claim은 String, Integer, Boolean만 저장 가능하다.
             String userIdStr = claims.get("userId", String.class);
