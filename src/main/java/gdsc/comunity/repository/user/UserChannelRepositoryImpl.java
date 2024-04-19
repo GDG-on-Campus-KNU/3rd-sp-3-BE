@@ -22,12 +22,12 @@ public class UserChannelRepositoryImpl implements UserChannelRepository{
     @Override
     public Map<Long, String> getNicknameMapByChannelId(Long channelId) {
         String sql = "SELECT uc.user_id, uc.nickname FROM user_channel uc WHERE uc.channel_id = ?";
-        return jdbcTemplate.query(sql, new Object[]{channelId}, rs -> {
+        return jdbcTemplate.query(sql, rs -> {
             Map<Long, String> resultMap = new HashMap<>();
             while (rs.next()) {
                 resultMap.put(rs.getLong("user_id"), rs.getString("nickname"));
             }
             return resultMap;
-        });
+        }, channelId);
     }
 }
