@@ -22,8 +22,7 @@ public class ChatService {
 
     @Async
     public void saveChat(Chatting chatting, Long channelId) {
-        var channel = channelRepository.findById(channelId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 채널을 찾을 수 없습니다."));
+        var channel = channelRepository.getReferenceById(channelId);
 
         Long userId = userChannelRepository.getUserIdByNicknameAndChannel(chatting.senderNickname, channel);
 
