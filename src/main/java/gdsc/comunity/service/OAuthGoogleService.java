@@ -4,6 +4,8 @@ import gdsc.comunity.dto.GoogleUserInfo;
 import gdsc.comunity.dto.JwtTokensDto;
 import gdsc.comunity.entity.user.Provider;
 import gdsc.comunity.entity.user.User;
+import gdsc.comunity.exception.CustomException;
+import gdsc.comunity.exception.ErrorCode;
 import gdsc.comunity.repository.user.UserRepository;
 import gdsc.comunity.security.jwt.JwtProvider;
 import gdsc.comunity.security.jwt.RefreshToken;
@@ -13,6 +15,7 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,23 +45,28 @@ public class OAuthGoogleService {
     private final UserRepository userRepository;
     private final RefreshTokenRepository refreshTokenRepository;
 
-    @Transactional
     public String getAccessToken(String code) {
         Map<String, String> responseBody;
 
-        responseBody = webClientForGetAccessToken.post()
-                .uri("token")
-                .headers(httpHeaders -> {
-                    httpHeaders.set("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
-                })
-                .body(BodyInserters.fromFormData("code", code)
-                        .with("client_id", CLIENT_ID)
-                        .with("client_secret", CLIENT_SECRET)
-                        .with("redirect_uri", REDIRECT_URI)
-                        .with("grant_type", "authorization_code"))
-                .retrieve()
-                .toEntity(Map.class)
-                .block().getBody();
+        try {
+            responseBody = webClientForGetAccessToken.post()
+                    .uri("token")
+                    .headers(httpHeaders -> {
+                        httpHeaders.set("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
+                    })
+                    .body(BodyInserters.fromFormData("code", code)
+                            .with("client_id", CLIENT_ID)
+                            .with("client_secret", CLIENT_SECRET)
+                            .with("redirect_uri", REDIRECT_URI)
+                            .with("grant_type", "authorization_code"))
+                    .retrieve()
+                    .toEntity(new ParameterizedTypeReference<Map<String, String>>() {
+                    })
+                    .block().getBody();
+
+        } catch (Exception e) {
+            throw new CustomException(ErrorCode.OAUTH_SERVER_ERROR);
+        }
 
         return responseBody.get("access_token");
     }
@@ -66,15 +74,21 @@ public class OAuthGoogleService {
     public Map<String, String> getUserInfoByAccessToken(String accessTokenByOAuth) {
         Map<String, String> responseBody;
 
-        responseBody = webClientForGetUserInfo.get()
-                .uri("")
-                .headers(httpHeaders -> {
-                    httpHeaders.set("Authorization", "Bearer " + accessTokenByOAuth);
-                })
-                .accept(MediaType.APPLICATION_JSON)
-                .retrieve()
-                .toEntity(Map.class)
-                .block().getBody();
+        try {
+            responseBody = webClientForGetUserInfo.get()
+                    .uri("")
+                    .headers(httpHeaders -> {
+                        httpHeaders.set("Authorization", "Bearer " + accessTokenByOAuth);
+                    })
+                    .accept(MediaType.APPLICATION_JSON)
+                    .retrieve()
+                    .toEntity(new ParameterizedTypeReference<Map<String, String>>() {
+                    })
+                    .block().getBody();
+
+        } catch (Exception e) {
+            throw new CustomException(ErrorCode.OAUTH_SERVER_ERROR);
+        }
 
         return responseBody;
     }
@@ -83,7 +97,7 @@ public class OAuthGoogleService {
     public JwtTokensDto loginOrRegister(Map<String, String> userInfo) {
         // 유저가 존재하는지 확인
         String email = userInfo.get("email");
-        Optional<User> userOP= userRepository.findByEmail(email);
+        Optional<User> userOP = userRepository.findByEmail(email);
 
         if (userOP.isEmpty()) {
             // 유저가 존재하지 않으면 회원가입
