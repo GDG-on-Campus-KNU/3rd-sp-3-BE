@@ -1,5 +1,6 @@
 package gdsc.comunity.service;
 
+import gdsc.comunity.dto.GoogleUserInfo;
 import gdsc.comunity.dto.JwtTokensDto;
 import gdsc.comunity.entity.user.Provider;
 import gdsc.comunity.entity.user.User;
@@ -8,7 +9,6 @@ import gdsc.comunity.security.jwt.JwtProvider;
 import gdsc.comunity.security.jwt.RefreshToken;
 import gdsc.comunity.security.jwt.RefreshTokenRepository;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +23,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class OAuthService {
+public class OAuthGoogleService {
     @Value("${spring.security.oauth2.client.registration.google.client-id}")
     private String CLIENT_ID;
 
@@ -61,7 +61,7 @@ public class OAuthService {
                 .retrieve()
                 .toEntity(Map.class)
                 .block().getBody();
-
+        log.info("responseBody : {}", responseBody);
         log.info("getAccessToken method end soon, code : {}", code);
         return responseBody.get("access_token");
     }
@@ -81,6 +81,7 @@ public class OAuthService {
                 .toEntity(Map.class)
                 .block().getBody();
 
+        log.info("responseBody : {}", responseBody);
         log.info("getUserInfoByAccessToken method end soon, accessTokenByOAuth : {}", accessTokenByOAuth);
         return responseBody;
     }
