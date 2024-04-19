@@ -16,8 +16,6 @@ import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
-@Builder
 @Entity
 public class ChatLog extends BaseTimeEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,4 +33,12 @@ public class ChatLog extends BaseTimeEntity {
 
     @Column(nullable = false)
     private LocalDateTime sendTime;
+
+    @Builder
+    public ChatLog(Long senderId, String content, Channel channel, LocalDateTime sendTime) {
+        this.senderId = senderId;
+        this.content = content;
+        this.channel = channel;
+        this.sendTime = sendTime;
+    }
 }
