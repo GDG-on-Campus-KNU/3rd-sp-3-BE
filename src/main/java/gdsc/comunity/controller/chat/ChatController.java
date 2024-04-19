@@ -10,6 +10,7 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -32,9 +33,9 @@ public class ChatController {
                 , chatting);
     }
 
-    @GetMapping("/api/chatLog/{channelId}/{page}")
+    @GetMapping("/api/chatLog/{channelId}")
     public ResponseEntity<PagingChatting> getChatLog(@PathVariable Long channelId,
-                                                     @PathVariable int page){
+                                                     @RequestParam int page){
         return ResponseEntity.ok(chatService.getChatLog(channelId, page));
     }
 
