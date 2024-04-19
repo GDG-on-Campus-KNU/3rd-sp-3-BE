@@ -55,25 +55,20 @@ public class SecurityConfig {
                 .logout(logout -> logout
                         .logoutUrl("/api/auth/logout")
                         .addLogoutHandler((request, response, authentication) -> {
-                            log.info("logout handler is running...");
-
                             //1. authentication에서 userId 추출
                             Long userId = ((UserPrincipal) authentication.getPrincipal()).getId();
-                            log.info("userId : {}", userId);
+
                             //2. 해당 userId로 redis에서 refresh token 조회 후 삭제
                             Optional<RefreshToken> refreshTokenOP = refreshTokenRepository.findByUserId(userId);
                             if (refreshTokenOP.isEmpty()) {
-                                log.info("refresh token is not found");
                                 throw new CustomException(ErrorCode.INVALID_REFRESH_TOKEN_ERROR);
                             }
                             refreshTokenRepository.delete(refreshTokenOP.get());
-                            log.info("logout handler is done...");
                         })
                         .logoutSuccessHandler((request, response, authentication) -> {
                             response.setStatus(HttpStatus.OK.value());
                             response.addHeader("message", "logout success");
                             }
-
                         )
                 )
 

@@ -26,11 +26,9 @@ public class OAuthController {
     ) {
         //1. 해당 코드로 구글에게 토큰을 요청
         String tokenByGoogle = oAuthGoogleService.getAccessToken(code);
-        log.info("tokenByGoogle : {}", tokenByGoogle);
 
         //2. 토큰을 받아서 유저 정보를 가져옴
         Map<String, String> userInfo = oAuthGoogleService.getUserInfoByAccessToken(tokenByGoogle);
-        log.info("userInfo : {}", userInfo);
 
         //3. 유저 정보를 토대로 회원가입 or 로그인
         JwtTokensDto jwtDto = oAuthGoogleService.loginOrRegister(userInfo);

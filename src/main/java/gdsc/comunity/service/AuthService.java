@@ -18,17 +18,15 @@ public class AuthService {
     private final JwtProvider jwtProvider;
     private final RefreshTokenRepository refreshTokenRepository;
     public void validateRefreshToken(String refreshToken) {
-        log.info("validateRefreshToken method start, refreshToken : {}", refreshToken);
         Claims claims = jwtProvider.validateToken(refreshToken);
         boolean isAccessToken = claims.get("isAccessToken", Boolean.class);
+
         if (isAccessToken) {
             throw new CustomException(ErrorCode.INVALID_REFRESH_TOKEN_ERROR);
         }
-        log.info("validateRefreshToken method end");
     }
 
     public JwtTokensDto refreshNewTokens(String refreshToken) {
-        log.info("refreshNewTokens method start, refreshToken : {}", refreshToken);
         //1. redis에서 해당 refresh token 조회하고 userId 얻기
         RefreshToken refreshTokenFromRepo = refreshTokenRepository.findByRefreshToken(refreshToken)
                 .orElseThrow(() -> new CustomException(ErrorCode.INVALID_REFRESH_TOKEN_ERROR));

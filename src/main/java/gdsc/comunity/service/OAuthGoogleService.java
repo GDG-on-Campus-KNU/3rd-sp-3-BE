@@ -45,8 +45,6 @@ public class OAuthGoogleService {
     @Transactional
     public String getAccessToken(String code) {
         Map<String, String> responseBody;
-        // OAuth 토큰 요청 보내기
-        log.info("getAccessToken method start, code : {}", code);
 
         responseBody = webClientForGetAccessToken.post()
                 .uri("token")
@@ -61,15 +59,12 @@ public class OAuthGoogleService {
                 .retrieve()
                 .toEntity(Map.class)
                 .block().getBody();
-        log.info("responseBody : {}", responseBody);
-        log.info("getAccessToken method end soon, code : {}", code);
+
         return responseBody.get("access_token");
     }
 
     public Map<String, String> getUserInfoByAccessToken(String accessTokenByOAuth) {
         Map<String, String> responseBody;
-        // OAuth 토큰으로 유저 정보 요청 보내기
-        log.info("getUserInfoByAccessToken method start, accessTokenByOAuth : {}", accessTokenByOAuth);
 
         responseBody = webClientForGetUserInfo.get()
                 .uri("")
@@ -81,8 +76,6 @@ public class OAuthGoogleService {
                 .toEntity(Map.class)
                 .block().getBody();
 
-        log.info("responseBody : {}", responseBody);
-        log.info("getUserInfoByAccessToken method end soon, accessTokenByOAuth : {}", accessTokenByOAuth);
         return responseBody;
     }
 

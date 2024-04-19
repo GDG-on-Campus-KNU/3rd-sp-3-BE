@@ -18,7 +18,7 @@ public class UserIdInterceptor implements HandlerInterceptor {
             Object handler
     ) throws Exception {
         UserPrincipal userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        log.info("UserIdInterceptor is running... userId: {}", userPrincipal.getId());
+
         //request객체에 UserId 값 추가
         request.setAttribute("userId", userPrincipal.getId());
 

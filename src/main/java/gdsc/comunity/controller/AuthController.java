@@ -27,8 +27,7 @@ public class AuthController {
         //1. refresh token 유효성 검증
         authService.validateRefreshToken(refreshTokenDto.refreshToken());
 
-        //2. 새로운 토큰 발급하고 기존 redis 삭제
-        //3. 리턴
-        return ResponseEntity.ok(authService.refreshNewTokens(refreshTokenDto.refreshToken()));
+        JwtTokensDto newTokens = authService.refreshNewTokens(refreshTokenDto.refreshToken());
+        return ResponseEntity.ok(newTokens);
     }
 }
