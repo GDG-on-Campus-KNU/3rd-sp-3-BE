@@ -1,12 +1,20 @@
 package gdsc.comunity.security.config;
 
+import gdsc.comunity.exception.CustomException;
+import gdsc.comunity.exception.ErrorCode;
 import gdsc.comunity.security.filter.JwtAuthenticationFilter;
 import gdsc.comunity.security.filter.JwtExceptionFilter;
+import gdsc.comunity.security.info.UserPrincipal;
 import gdsc.comunity.security.jwt.JwtProvider;
+import gdsc.comunity.security.jwt.RefreshToken;
+import gdsc.comunity.security.jwt.RefreshTokenRepository;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -14,10 +22,12 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 
+@Slf4j
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final JwtProvider jwtProvider;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
@@ -42,11 +52,30 @@ public class SecurityConfig {
                 )
                 .formLogin(AbstractHttpConfigurer::disable)
 
-//                .logout(logout -> logout
-//                        .logoutUrl("/api/auth/logout")
-//                        .addLogoutHandler()
-//                        .logoutSuccessHandler()
-//                )
+                .logout(logout -> logout
+                        .logoutUrl("/api/auth/logout")
+                        .addLogoutHandler((request, response, authentication) -> {
+                            log.info("logout handler is running...");
+
+                            //1. authentication에서 userId 추출
+                            Long userId = ((UserPrincipal) authentication.getPrincipal()).getId();
+                            log.info("userId : {}", userId);
+                            //2. 해당 userId로 redis에서 refresh token 조회 후 삭제
+                            Optional<RefreshToken> refreshTokenOP = refreshTokenRepository.findByUserId(userId);
+                            if (refreshTokenOP.isEmpty()) {
+                                log.info("refresh token is not found");
+                                throw new CustomException(ErrorCode.INVALID_REFRESH_TOKEN_ERROR);
+                            }
+                            refreshTokenRepository.delete(refreshTokenOP.get());
+                            log.info("logout handler is done...");
+                        })
+                        .logoutSuccessHandler((request, response, authentication) -> {
+                            response.setStatus(HttpStatus.OK.value());
+                            response.addHeader("message", "logout success");
+                            }
+
+                        )
+                )
 
                 .exceptionHandling(exceptionHandling -> exceptionHandling
                         .authenticationEntryPoint((request, response, authException) -> response.setStatus(HttpServletResponse.SC_UNAUTHORIZED))
