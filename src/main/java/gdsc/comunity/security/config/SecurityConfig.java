@@ -47,6 +47,7 @@ public class SecurityConfig {
                         registry
                                 .requestMatchers("/api/login", "/api/auth/register").permitAll()
                                 .requestMatchers("/oauth/**").permitAll()
+                                .requestMatchers("/api/auth/refresh").permitAll()
                                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                                 .anyRequest().authenticated()
                 )
