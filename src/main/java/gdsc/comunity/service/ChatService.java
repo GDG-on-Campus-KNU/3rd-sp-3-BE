@@ -24,7 +24,7 @@ public class ChatService {
     public void saveChat(Chatting chatting, Long channelId) {
         var channel = channelRepository.getReferenceById(channelId);
 
-        Long userId = userChannelRepository.getUserIdByNicknameAndChannel(chatting.senderNickname, channel);
+        Long userId = userChannelRepository.getUserIdByNicknameAndChannel(chatting.senderNickname, channelId);
 
         chatRepository.save(chatting.toEntity(channel, userId));
     }

@@ -1,6 +1,5 @@
 package gdsc.comunity.repository.user;
 
-import gdsc.comunity.entity.channel.Channel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -15,8 +14,8 @@ public class UserChannelRepositoryImpl implements UserChannelRepository{
     private final JdbcTemplate jdbcTemplate;
 
     @Override
-    public Long getUserIdByNicknameAndChannel(String senderNickname, Channel channel) {
-        return userChannelJpaRepository.findUserIdByNicknameAndChannel(senderNickname, channel.getId())
+    public Long getUserIdByNicknameAndChannel(String senderNickname, Long channelId) {
+        return userChannelJpaRepository.findUserIdByNicknameAndChannel(senderNickname, channelId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 유저를 찾을 수 없습니다."));
     }
 
