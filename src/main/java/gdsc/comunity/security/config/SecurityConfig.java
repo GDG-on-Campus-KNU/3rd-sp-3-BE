@@ -62,7 +62,7 @@ public class SecurityConfig {
                             //2. 해당 userId로 redis에서 refresh token 조회 후 삭제
                             Optional<RefreshToken> refreshTokenOP = refreshTokenRepository.findByUserId(userId);
                             if (refreshTokenOP.isEmpty()) {
-                                throw new CustomException(ErrorCode.INVALID_REFRESH_TOKEN_ERROR);
+                                throw new CustomException(ErrorCode.EMPTY_REFRESH_TOKEN_ERROR);
                             }
                             refreshTokenRepository.delete(refreshTokenOP.get());
                         })
