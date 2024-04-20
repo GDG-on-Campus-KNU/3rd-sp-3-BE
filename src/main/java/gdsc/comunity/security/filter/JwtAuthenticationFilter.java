@@ -4,6 +4,7 @@ import gdsc.comunity.exception.CustomException;
 import gdsc.comunity.exception.ErrorCode;
 import gdsc.comunity.security.info.UserPrincipal;
 import gdsc.comunity.security.jwt.JwtProvider;
+import gdsc.comunity.security.jwt.JwtVO;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -25,10 +26,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        String bearerToken = request.getHeader("Authorization");
-        if (bearerToken == null || !bearerToken.startsWith("Bearer ")) {
+        String bearerToken = request.getHeader(JwtVO.HEADER);
+
+        if (bearerToken == null) {
             filterChain.doFilter(request, response);
             return;
+        }
+
+        if (!bearerToken.startsWith(JwtVO.TOKEN_PREFIX)) {
+            throw new CustomException(ErrorCode.INVALID_TOKEN_PREFIX_ERROR);
         }
 
         String accessToken = bearerToken.substring(7);
@@ -38,6 +44,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         } catch (Exception e) {
             throw new CustomException(ErrorCode.INVALID_ACCESS_TOKEN_ERROR);
         }
+
         if (claims.get("isAccessToken", Boolean.class)) {
             //Claim은 String, Integer, Boolean만 저장 가능하다.
             String userIdStr = claims.get("userId", String.class);
