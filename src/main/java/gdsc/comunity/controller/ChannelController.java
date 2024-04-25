@@ -1,5 +1,6 @@
 package gdsc.comunity.controller;
 
+import gdsc.comunity.dto.channel.ApproveJoinChannelDto;
 import gdsc.comunity.dto.channel.ChannelInfoDto;
 import gdsc.comunity.entity.user.Provider;
 import gdsc.comunity.entity.user.User;
@@ -8,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/channel")
@@ -22,9 +25,48 @@ public class ChannelController {
         return new ResponseEntity<>("Channel created.", HttpStatus.CREATED);
     }
 
-    @GetMapping
-    ResponseEntity<ChannelInfoDto> searchChannel(@RequestParam Long channelId, Long id){
+    @GetMapping("/{channelId}")
+    ResponseEntity<ChannelInfoDto> searchChannel(@PathVariable Long channelId, Long id){
         ChannelInfoDto channelInfoDto = channelServiceImpl.searchChannel(channelId);
         return new ResponseEntity<>(channelInfoDto, HttpStatus.OK);
+    }
+
+    @GetMapping("/join/{channelId}")
+    ResponseEntity<?> searchJoinRequest(@PathVariable Long channelId, Long id){
+        // TODO : 반환 형식이 아직 정해지지 않았다. 회의를 통해 문서화하고 코드에 반영 필요.
+        List<Object> userList = channelServiceImpl.searchJoinRequest(id, channelId);
+        return new ResponseEntity<>(userList, HttpStatus.OK);
+    }
+
+    @PostMapping("/join/{channelId}")
+    ResponseEntity<String> sendJoinRequest(@RequestBody String nickname, @PathVariable Long channelId, Long id){
+        channelServiceImpl.sendJoinRequest(nickname, id, channelId);
+        return new ResponseEntity<>("Channel joined.", HttpStatus.OK);
+    }
+
+    @PutMapping("/join/{channelId}")
+    ResponseEntity<String> leaveChannel(@PathVariable Long channelId, Long id){
+        channelServiceImpl.leaveChannel(id, channelId);
+        return new ResponseEntity<>("Channel left.", HttpStatus.OK);
+    }
+
+    @DeleteMapping("/join/{channelId}")
+    ResponseEntity<String> deleteChannel(@PathVariable Long channelId, Long id){
+        channelServiceImpl.deleteChannel(id, channelId);
+        return new ResponseEntity<>("Channel deleted.", HttpStatus.OK);
+    }
+
+    @PutMapping("/approve")
+    ResponseEntity<String> approveJoinChannel(@RequestBody ApproveJoinChannelDto approveJoinChannelDto, Long userId){
+        Long targetUserId = approveJoinChannelDto.getUserId();
+        Long channelId = approveJoinChannelDto.getChannelId();
+        channelServiceImpl.approveJoinChannel(userId, targetUserId, channelId);
+        return new ResponseEntity<>("Channel joined.", HttpStatus.OK);
+    }
+
+    @PutMapping("/nickname")
+    ResponseEntity<String> changeNickname(@RequestBody String nickname, Long id){
+        channelServiceImpl.changeNickname(id, nickname);
+        return new ResponseEntity<>("Nickname changed.", HttpStatus.OK);
     }
 }

@@ -8,9 +8,7 @@ import java.util.List;
 
 @AllArgsConstructor
 @Getter
-public class ChannelInfoDto {
-    private String channelName;
-    private String openDate;
-    private String managerNickname;
-    private List<User> channelUsers;
+public class ApproveJoinChannelDto {
+    private Long userId;
+    private Long channelId;
 }

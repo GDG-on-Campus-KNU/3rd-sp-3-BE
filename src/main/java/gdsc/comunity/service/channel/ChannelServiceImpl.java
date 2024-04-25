@@ -2,8 +2,10 @@ package gdsc.comunity.service.channel;
 
 import gdsc.comunity.dto.channel.ChannelInfoDto;
 import gdsc.comunity.entity.channel.Channel;
+import gdsc.comunity.entity.channel.ChannelJoinRequest;
 import gdsc.comunity.entity.user.User;
 import gdsc.comunity.entity.user.UserChannel;
+import gdsc.comunity.repository.channel.ChannelJoinRequestRepository;
 import gdsc.comunity.repository.channel.ChannelRepository;
 import gdsc.comunity.repository.user.UserChannelRepository;
 import gdsc.comunity.repository.user.UserRepository;
@@ -22,6 +24,7 @@ public class ChannelServiceImpl implements ChannelService {
     private final ChannelRepository channelRepository;
     private final UserChannelRepository userChannelRepository;
     private final UserRepository userRepository;
+    private final ChannelJoinRequestRepository channelJoinRequestRepository;
 
     @Override
     public Channel createChannel(Long userId, String channelName) {
@@ -38,24 +41,24 @@ public class ChannelServiceImpl implements ChannelService {
     @Transactional
     public void leaveChannel(Long userId, Long channelId) {
         User user = userRepository.findById(userId).orElseThrow();
-
         Channel channel = channelRepository.findById(channelId).orElseThrow();
         if (!(Objects.equals(channel.getManager().getId(), user.getId()))) {
-            UserChannel userChannel = userChannelRepository.findByUserIdAndChannelId(user.getId(), channelId).orElseThrow();
-            userChannelRepository.delete(userChannel);
+            userChannelRepository.findByUserIdAndChannelId(user.getId(), channelId).ifPresentOrElse(
+                    userChannelRepository::delete,
+                    () -> {
+                        throw new IllegalArgumentException("You are not in this channel.");
+                    }
+            );
             return;
         }
-        // TODO : 채널 매니저가 나갈 경우 새로운 매니저 지정 - 만약, 더 이상 새로운 매니저를 지정할 수 없다면 deleteChannel을 물어보도록??
-        Optional<UserChannel> newOptionalManager = userChannelRepository.findSecondByChannelIdOrderByCreatedDateDesc(channelId);
-        if (newOptionalManager.isEmpty()) {
-            throw new IllegalArgumentException("There is no manager in this channel.");
-        }
-        User newManager = newOptionalManager.get().getUser();
-        channel.updateManager(newManager);
+
+        UserChannel newManagerUserChannel = userChannelRepository.findSecondByChannelIdOrderByCreatedDateDesc(channelId)
+                .orElseThrow(() -> new IllegalArgumentException("There is no manager in this channel."));
+        channel.updateManager(newManagerUserChannel.getUser());
         channelRepository.save(channel);
 
-        UserChannel userChannel = userChannelRepository.findByUserIdAndChannelId(user.getId(), channelId).orElseThrow();
-        userChannelRepository.delete(userChannel);
+        UserChannel deleteUserChannel = userChannelRepository.findByUserIdAndChannelId(user.getId(), channelId).orElseThrow();
+        userChannelRepository.delete(deleteUserChannel);
     }
 
     @Override
@@ -85,5 +88,39 @@ public class ChannelServiceImpl implements ChannelService {
                 manager.getNickname(),
                 channelUsers
         );
+    }
+
+    @Override
+    public void sendJoinRequest(String nickname, Long userId, Long channelId) {
+        userChannelRepository.findAllByChannelId(channelId).stream()
+                .filter(userChannel -> userChannel.getNickname().equals(nickname))
+                .findAny()
+                .ifPresent(userChannel -> {
+                    throw new IllegalArgumentException("Nickname is already exist in this channel.");
+                });
+
+        User user = userRepository.findById(userId).orElseThrow();
+        Channel channel = channelRepository.findById(channelId).orElseThrow();
+
+        channelJoinRequestRepository.save(ChannelJoinRequest
+                .builder()
+                .channel(channel)
+                .user(user)
+                .nickname(nickname)
+                .build());
+    }
+
+    @Override
+    public void approveJoinChannel(Long userId, Long targetUserId, Long channelId){
+    }
+
+    @Override
+    public List<Object> searchJoinRequest(Long userId, Long channelId) {
+        return null;
+    }
+
+    @Override
+    public void changeNickname(Long userId, String nickname){
+
     }
 }
