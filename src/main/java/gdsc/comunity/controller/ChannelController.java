@@ -2,6 +2,8 @@ package gdsc.comunity.controller;
 
 import gdsc.comunity.dto.channel.ApproveJoinChannelDto;
 import gdsc.comunity.dto.channel.ChannelInfoDto;
+import gdsc.comunity.dto.channel.ChannelNicknameDto;
+import gdsc.comunity.entity.channel.ChannelJoinRequest;
 import gdsc.comunity.entity.user.Provider;
 import gdsc.comunity.entity.user.User;
 import gdsc.comunity.service.channel.ChannelServiceImpl;
@@ -32,9 +34,9 @@ public class ChannelController {
     }
 
     @GetMapping("/join/{channelId}")
-    ResponseEntity<?> searchJoinRequest(@PathVariable Long channelId, Long id){
+    ResponseEntity<List<ChannelJoinRequest>> searchJoinRequest(@PathVariable Long channelId, Long id){
         // TODO : 반환 형식이 아직 정해지지 않았다. 회의를 통해 문서화하고 코드에 반영 필요.
-        List<Object> userList = channelServiceImpl.searchJoinRequest(id, channelId);
+        List<ChannelJoinRequest> userList = channelServiceImpl.searchJoinRequest(id, channelId);
         return new ResponseEntity<>(userList, HttpStatus.OK);
     }
 
@@ -65,8 +67,10 @@ public class ChannelController {
     }
 
     @PutMapping("/nickname")
-    ResponseEntity<String> changeNickname(@RequestBody String nickname, Long id){
-        channelServiceImpl.changeNickname(id, nickname);
+    ResponseEntity<String> changeNickname(@RequestBody ChannelNicknameDto channelNicknameDto, Long id){
+        String nickname = channelNicknameDto.getNickname();
+        Long channelId = channelNicknameDto.getChannelId();
+        channelServiceImpl.changeNickname(id, channelId, nickname);
         return new ResponseEntity<>("Nickname changed.", HttpStatus.OK);
     }
 }

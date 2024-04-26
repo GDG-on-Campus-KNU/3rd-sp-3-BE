@@ -40,6 +40,10 @@ public class UserChannel extends BaseTimeEntity {
         this.user = user;
         this.channel = channel;
     }
+
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
 }
 
 

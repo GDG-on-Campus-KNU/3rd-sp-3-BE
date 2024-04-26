@@ -2,6 +2,7 @@ package gdsc.comunity.service.channel;
 
 import gdsc.comunity.dto.channel.ChannelInfoDto;
 import gdsc.comunity.entity.channel.Channel;
+import gdsc.comunity.entity.channel.ChannelJoinRequest;
 import gdsc.comunity.entity.user.User;
 
 import java.util.List;
@@ -15,11 +16,13 @@ public interface ChannelService {
 
     ChannelInfoDto searchChannel(Long channelId);
 
-    void approveJoinChannel(Long id, Long userId, Long channelId);
+    void approveJoinChannel(Long userId, Long targetUserId, Long channelId);
 
-    void sendJoinRequest(String nickname, Long id, Long channelId);
+    void sendJoinRequest(String nickname, Long userId, Long channelId);
 
-    List<Object> searchJoinRequest(Long id, Long channelId);
+    List<ChannelJoinRequest> searchJoinRequest(Long userId, Long channelId);
 
-    void changeNickname(Long id, String nickname);
+    void changeNickname(Long userId, Long channelId, String nickname);
+
+    void doubleCheckNicknameThrowException(Long channelId, String nickname);
 }
