@@ -1,6 +1,7 @@
 package gdsc.comunity.service.channel;
 
 import gdsc.comunity.dto.channel.ChannelInfoDto;
+import gdsc.comunity.dto.channel.ChannelJoinRequestDto;
 import gdsc.comunity.entity.channel.Channel;
 import gdsc.comunity.entity.channel.ChannelJoinRequest;
 import gdsc.comunity.entity.user.User;
@@ -20,7 +21,7 @@ public interface ChannelService {
 
     void sendJoinRequest(String nickname, Long userId, Long channelId);
 
-    List<ChannelJoinRequest> searchJoinRequest(Long userId, Long channelId);
+    List<ChannelJoinRequestDto> searchJoinRequest(Long userId, Long channelId);
 
     void changeNickname(Long userId, Long channelId, String nickname);
 

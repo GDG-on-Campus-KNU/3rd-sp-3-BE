@@ -8,7 +8,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
-@Repository
 public interface UserChannelRepository extends JpaRepository<UserChannel, Long> {
     List<UserChannel> findTop2ByChannelIdOrderByCreatedDateAsc(Long channelId);
 

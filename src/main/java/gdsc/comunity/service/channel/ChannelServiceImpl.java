@@ -1,6 +1,7 @@
 package gdsc.comunity.service.channel;
 
 import gdsc.comunity.dto.channel.ChannelInfoDto;
+import gdsc.comunity.dto.channel.ChannelJoinRequestDto;
 import gdsc.comunity.entity.channel.Channel;
 import gdsc.comunity.entity.channel.ChannelJoinRequest;
 import gdsc.comunity.entity.user.User;
@@ -94,7 +95,9 @@ public class ChannelServiceImpl implements ChannelService {
     @Override
     public ChannelInfoDto searchChannel(Long channelId) {
         Channel channel = channelRepository.findById(channelId).orElseThrow();
-        List<User> channelUsers = userChannelRepository.findAllByChannelId(channelId).stream().map(UserChannel::getUser).toList();
+        List<UserChannel> userChannels = userChannelRepository.findAllByChannelId(channelId);
+        List<User> channelUsers = userChannels.stream().map(UserChannel::getUser).toList();
+
         UserChannel manager = userChannelRepository.findByUserIdAndChannelId(channel.getManager().getId(), channelId).orElseThrow();
 
         // 요청한 채널의 정보(채널 이름, 생성일, 매니저 닉네임, 채널 유저 리스트) 반환
@@ -102,6 +105,7 @@ public class ChannelServiceImpl implements ChannelService {
                 channel.getChannelName(),
                 channel.getCreatedDate().toString(),
                 manager.getNickname(),
+                userChannels,
                 channelUsers
         );
     }
@@ -139,14 +143,21 @@ public class ChannelServiceImpl implements ChannelService {
     }
 
     @Override
-    public List<ChannelJoinRequest> searchJoinRequest(Long userId, Long channelId) {
+    public List<ChannelJoinRequestDto> searchJoinRequest(Long userId, Long channelId) {
         // 채널의 매니저가 이나라면 예외 발생
         Channel channel = channelRepository.findById(channelId).
                 orElseThrow(() -> new IllegalArgumentException("Channel does not exist."));
         if (!Objects.equals(channel.getManager().getId(), userId)) {
             throw new IllegalArgumentException("Only manager can search join request.");
         }
-        return channelJoinRequestRepository.findAllByChannelId(channelId);
+        return channelJoinRequestRepository.findAllByChannelId(channelId).stream().map(
+                channelJoinRequest -> new ChannelJoinRequestDto(
+                        channelJoinRequest.getId(),
+                        channelJoinRequest.getUser().getId(),
+                        channelJoinRequest.getChannel().getId(),
+                        channelJoinRequest.getNickname()
+                )
+        ).toList();
     }
 
     @Override

@@ -1,13 +1,11 @@
 package gdsc.comunity.controller;
 
-import gdsc.comunity.dto.channel.ApproveJoinChannelDto;
-import gdsc.comunity.dto.channel.ChannelCreateDto;
-import gdsc.comunity.dto.channel.ChannelInfoDto;
-import gdsc.comunity.dto.channel.ChannelNicknameDto;
+import gdsc.comunity.dto.channel.*;
 import gdsc.comunity.entity.channel.ChannelJoinRequest;
 import gdsc.comunity.entity.user.Provider;
 import gdsc.comunity.entity.user.User;
 import gdsc.comunity.service.channel.ChannelServiceImpl;
+import gdsc.comunity.util.ListWrapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +19,6 @@ import java.util.List;
 public class ChannelController {
     private final ChannelServiceImpl channelServiceImpl;
 
-    // TODO : 사용자 id는 @UserId 어노테이션으로 받아올 예정이다.
     @PostMapping
     ResponseEntity<String> createChannel(@RequestBody ChannelCreateDto channelCreateDto, Long id){
         String channelName = channelCreateDto.getChannelName();
@@ -37,10 +34,9 @@ public class ChannelController {
     }
 
     @GetMapping("/join/{channelId}")
-    ResponseEntity<List<ChannelJoinRequest>> searchJoinRequest(@PathVariable Long channelId, Long id){
-        // TODO : 반환 형식이 아직 정해지지 않았다. 회의를 통해 문서화하고 코드에 반영 필요.
-        List<ChannelJoinRequest> userList = channelServiceImpl.searchJoinRequest(id, channelId);
-        return new ResponseEntity<>(userList, HttpStatus.OK);
+    ResponseEntity<ListWrapper<List<ChannelJoinRequestDto>>> searchJoinRequest(@PathVariable Long channelId, Long id){
+        List<ChannelJoinRequestDto> userList = channelServiceImpl.searchJoinRequest(id, channelId);
+        return new ResponseEntity<>(new ListWrapper<>(userList), HttpStatus.OK);
     }
 
     @PostMapping("/join/{channelId}")
