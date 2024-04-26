@@ -1,6 +1,7 @@
 package gdsc.comunity.controller;
 
 import gdsc.comunity.dto.channel.ApproveJoinChannelDto;
+import gdsc.comunity.dto.channel.ChannelCreateDto;
 import gdsc.comunity.dto.channel.ChannelInfoDto;
 import gdsc.comunity.dto.channel.ChannelNicknameDto;
 import gdsc.comunity.entity.channel.ChannelJoinRequest;
@@ -22,8 +23,10 @@ public class ChannelController {
 
     // TODO : 사용자 id는 @UserId 어노테이션으로 받아올 예정이다.
     @PostMapping
-    ResponseEntity<String> createChannel(@RequestBody String channelName, Long id){
-        channelServiceImpl.createChannel(id, channelName);
+    ResponseEntity<String> createChannel(@RequestBody ChannelCreateDto channelCreateDto, Long id){
+        String channelName = channelCreateDto.getChannelName();
+        String nickname = channelCreateDto.getNickname();
+        channelServiceImpl.createChannel(id, channelName, nickname);
         return new ResponseEntity<>("Channel created.", HttpStatus.CREATED);
     }
 

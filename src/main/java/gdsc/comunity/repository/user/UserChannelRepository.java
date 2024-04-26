@@ -1,24 +1,22 @@
 package gdsc.comunity.repository.user;
 
 
-import gdsc.comunity.entity.user.User;
 import gdsc.comunity.entity.user.UserChannel;
-import org.springframework.boot.autoconfigure.flyway.FlywayProperties;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
+@Repository
 public interface UserChannelRepository extends JpaRepository<UserChannel, Long> {
-    Optional<UserChannel> findSecondByChannelIdOrderByCreatedDateDesc(Long channelId);
+    List<UserChannel> findTop2ByChannelIdOrderByCreatedDateAsc(Long channelId);
 
-    Optional<UserChannel> findByUserIdAndChannelId(Long id, Long channelId);
+    Optional<UserChannel> findByUserIdAndChannelId(Long userId, Long channelId);
 
     void deleteAllByChannelId(Long channelId);
 
     List<UserChannel> findAllByChannelId(Long channelId);
-
-    Optional<UserChannel> findByUserIdAndNickname(Long userId, String nickname);
 
     Optional<UserChannel> findByUserId(Long userId);
 }

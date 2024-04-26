@@ -26,13 +26,21 @@ public class ChannelServiceImpl implements ChannelService {
     private final ChannelJoinRequestRepository channelJoinRequestRepository;
 
     @Override
-    public Channel createChannel(Long userId, String channelName) {
+    public Channel createChannel(Long userId, String channelName, String nickname) {
         User user = userRepository.findById(userId).orElseThrow();
         Channel newChannel = Channel.builder()
                 .channelName(channelName)
                 .manager(user)
                 .build();
         channelRepository.save(newChannel);
+
+        UserChannel userChannel = UserChannel.builder()
+                .channel(newChannel)
+                .user(user)
+                .nickname(nickname)
+                .build();
+        userChannelRepository.save(userChannel);
+
         return newChannel;
     }
 
@@ -53,8 +61,12 @@ public class ChannelServiceImpl implements ChannelService {
         }
 
         // 대상이 매니저인 경우, 채널 매니저 변경
-        UserChannel newManagerUserChannel = userChannelRepository.findSecondByChannelIdOrderByCreatedDateDesc(channelId)
-                .orElseThrow(() -> new IllegalArgumentException("There is no manager in this channel."));
+        List<UserChannel> userChannelList = userChannelRepository.findTop2ByChannelIdOrderByCreatedDateAsc(channelId);
+        // list의 size가 2이상인 경우 진행 아니면 exception
+        if (userChannelList.size() < 2) {
+            throw new IllegalArgumentException("There is no user to be a manager.");
+        }
+        UserChannel newManagerUserChannel = userChannelList.get(1);
         channel.updateManager(newManagerUserChannel.getUser());
         channelRepository.save(channel);
 
@@ -112,7 +124,7 @@ public class ChannelServiceImpl implements ChannelService {
 
     @Override
     @Transactional
-    public void approveJoinChannel(Long userId, Long targetUserId, Long channelId){
+    public void approveJoinChannel(Long userId, Long targetUserId, Long channelId) {
         // 채널 가입 요청을 승인하고 UserChannel에 저장. 이후 ChannelJoinRequest 삭제
         ChannelJoinRequest channelJoinRequest = channelJoinRequestRepository.findByUserIdAndChannelId(targetUserId, channelId).orElseThrow();
         User user = userRepository.findById(userId).orElseThrow();
@@ -138,7 +150,7 @@ public class ChannelServiceImpl implements ChannelService {
     }
 
     @Override
-    public void changeNickname(Long userId, Long channelId, String nickname){
+    public void changeNickname(Long userId, Long channelId, String nickname) {
         // 닉네임 중복 확인 후 변경.
         doubleCheckNicknameThrowException(channelId, nickname);
 
@@ -148,7 +160,7 @@ public class ChannelServiceImpl implements ChannelService {
     }
 
     @Override
-    public void doubleCheckNicknameThrowException(Long channelId, String nickname){
+    public void doubleCheckNicknameThrowException(Long channelId, String nickname) {
         // 닉네임 중복 시 throw Exception
         userChannelRepository.findAllByChannelId(channelId).stream()
                 .filter(userChannel -> userChannel.getNickname().equals(nickname))

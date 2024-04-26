@@ -45,6 +45,3 @@ public class UserChannel extends BaseTimeEntity {
         this.nickname = nickname;
     }
 }
-
-
-

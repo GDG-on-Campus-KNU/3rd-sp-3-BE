@@ -8,7 +8,7 @@ import gdsc.comunity.entity.user.User;
 import java.util.List;
 
 public interface ChannelService {
-    Channel createChannel(Long userId, String channelName);
+    Channel createChannel(Long userId, String channelName, String nickname);
 
     void leaveChannel(Long userId, Long channelId);
 
