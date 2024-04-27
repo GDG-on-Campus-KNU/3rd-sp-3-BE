@@ -32,6 +32,30 @@ dependencies {
 	// Swagger
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
 
+	//Spring Security
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+
+	//jwt
+	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+	implementation 'jakarta.xml.bind:jakarta.xml.bind-api:4.0.0'
+	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+
+	//validation
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+	//JSON
+	implementation 'com.google.code.gson:gson'
+
+	//WebClient
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+	//Postgre SQL
+	implementation 'org.postgresql:postgresql'
+
+	//Redis
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
 	// Websocket
 	implementation 'org.springframework.boot:spring-boot-starter-websocket'
 }
