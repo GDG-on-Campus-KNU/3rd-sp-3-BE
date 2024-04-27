@@ -12,6 +12,7 @@ spring:
       port: ${REDIS_PORT}
 
   jpa:
+    defer-datasource-initialization: true
     hibernate:
       ddl-auto: create
       naming:
