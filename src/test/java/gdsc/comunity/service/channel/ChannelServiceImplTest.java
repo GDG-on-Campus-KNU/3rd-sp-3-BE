@@ -12,7 +12,7 @@ import gdsc.comunity.entity.user.User;
 import gdsc.comunity.entity.user.UserChannel;
 import gdsc.comunity.repository.channel.ChannelJoinRequestRepository;
 import gdsc.comunity.repository.channel.ChannelRepository;
-import gdsc.comunity.repository.user.UserChannelRepository;
+import gdsc.comunity.repository.user.UserChannelJpaRepository;
 import gdsc.comunity.repository.user.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
@@ -20,19 +20,22 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 //import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
-//TODO : Test code 작성
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
-//@ActiveProfiles("test") // Ensure you use the 'test' profile to avoid using the production database
+@ActiveProfiles("test")
 @Transactional
+@Rollback
 @Slf4j
 @TestMethodOrder(MethodOrderer.MethodName.class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ChannelServiceImplTest {
     @Autowired
     private ChannelServiceImpl channelService;
@@ -41,7 +44,7 @@ public class ChannelServiceImplTest {
     @Autowired
     private ChannelRepository channelRepository;
     @Autowired
-    private UserChannelRepository userChannelRepository;
+    private UserChannelJpaRepository userChannelJpaRepository;
     @Autowired
     private ChannelJoinRequestRepository channelJoinRequestRepository;
 
@@ -65,7 +68,7 @@ public class ChannelServiceImplTest {
         assertEquals("New Channel", channel.getChannelName());
         assertEquals(user.getId(), channel.getManager().getId());
 
-        Optional<UserChannel> userChannel = userChannelRepository.findByUserIdAndChannelId(user.getId(), channel.getId());
+        Optional<UserChannel> userChannel = userChannelJpaRepository.findByUserIdAndChannelId(user.getId(), channel.getId());
         assertTrue(userChannel.isPresent());
     }
 
@@ -95,7 +98,7 @@ public class ChannelServiceImplTest {
         channelService.sendJoinRequest("nickname2", user.getId(), channel.getId());
 
         // assert result
-        Optional<UserChannel> userChannel = userChannelRepository.findByUserIdAndChannelId(user.getId(), channel.getId());
+        Optional<UserChannel> userChannel = userChannelJpaRepository.findByUserIdAndChannelId(user.getId(), channel.getId());
         assertTrue(userChannel.isEmpty());
 
         Optional<ChannelJoinRequest> channelJoinRequest = channelJoinRequestRepository.findByUserIdAndChannelId(user.getId(), channel.getId());
@@ -107,7 +110,7 @@ public class ChannelServiceImplTest {
     void approveJoinChannel_Success() {
         // set env
         User user = User.builder()
-                .email("email")
+                .email("email2")
                 .profileImageUrl("image")
                 .provider(Provider.GOOGLE)
                 .providerId("1")
@@ -130,7 +133,7 @@ public class ChannelServiceImplTest {
         channelService.approveJoinChannel(manager.getId(), user.getId(), channel.getId());
 
         // assert result
-        Optional<UserChannel> userChannel = userChannelRepository.findByUserIdAndChannelId(user.getId(), channel.getId());
+        Optional<UserChannel> userChannel = userChannelJpaRepository.findByUserIdAndChannelId(user.getId(), channel.getId());
         assertTrue(userChannel.isPresent());
 
         Optional<ChannelJoinRequest> channelJoinRequest = channelJoinRequestRepository.findByUserIdAndChannelId(user.getId(), channel.getId());
@@ -165,7 +168,7 @@ public class ChannelServiceImplTest {
         channelService.leaveChannel(manager.getId(), channel.getId());
 
         // Assert
-        Optional<UserChannel> userChannel = userChannelRepository.findByUserIdAndChannelId(manager.getId(), channel.getId());
+        Optional<UserChannel> userChannel = userChannelJpaRepository.findByUserIdAndChannelId(manager.getId(), channel.getId());
         assertTrue(userChannel.isEmpty());
 
         Optional<Channel> channelOptional = channelRepository.findById(channel.getId());
@@ -232,7 +235,7 @@ public class ChannelServiceImplTest {
         channelService.approveJoinChannel(manager.getId(), user2.getId(), channel.getId());
 
         // Act
-        List<UserChannel> listUserChannel = userChannelRepository.findTop2ByChannelIdOrderByCreatedDateAsc(channel.getId());
+        List<UserChannel> listUserChannel = userChannelJpaRepository.findTop2ByChannelIdOrderByCreatedDateAsc(channel.getId());
 
         // Assert
         assertEquals(2, listUserChannel.size());
@@ -266,7 +269,7 @@ public class ChannelServiceImplTest {
         channelService.leaveChannel(manager.getId(), channel.getId());
 
         // Assert
-        Optional<UserChannel> userChannel = userChannelRepository.findByUserIdAndChannelId(manager.getId(), channel.getId());
+        Optional<UserChannel> userChannel = userChannelJpaRepository.findByUserIdAndChannelId(manager.getId(), channel.getId());
         assertTrue(userChannel.isEmpty());
 
         Optional<Channel> channelOptional = channelRepository.findById(channel.getId());

@@ -8,7 +8,7 @@ import gdsc.comunity.entity.user.User;
 import gdsc.comunity.entity.user.UserChannel;
 import gdsc.comunity.repository.channel.ChannelJoinRequestRepository;
 import gdsc.comunity.repository.channel.ChannelRepository;
-import gdsc.comunity.repository.user.UserChannelRepository;
+import gdsc.comunity.repository.user.UserChannelJpaRepository;
 import gdsc.comunity.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,7 +22,7 @@ import java.util.Objects;
 // TODO : Exception handling
 public class ChannelServiceImpl implements ChannelService {
     private final ChannelRepository channelRepository;
-    private final UserChannelRepository userChannelRepository;
+    private final UserChannelJpaRepository userChannelJpaRepository;
     private final UserRepository userRepository;
     private final ChannelJoinRequestRepository channelJoinRequestRepository;
 
@@ -40,7 +40,7 @@ public class ChannelServiceImpl implements ChannelService {
                 .user(user)
                 .nickname(nickname)
                 .build();
-        userChannelRepository.save(userChannel);
+        userChannelJpaRepository.save(userChannel);
 
         return newChannel;
     }
@@ -52,8 +52,8 @@ public class ChannelServiceImpl implements ChannelService {
         Channel channel = channelRepository.findById(channelId).orElseThrow();
         // 대상이 매니저가 아닌 경우, UserChannel 삭제
         if (!(Objects.equals(channel.getManager().getId(), user.getId()))) {
-            userChannelRepository.findByUserIdAndChannelId(user.getId(), channelId).ifPresentOrElse(
-                    userChannelRepository::delete,
+            userChannelJpaRepository.findByUserIdAndChannelId(user.getId(), channelId).ifPresentOrElse(
+                    userChannelJpaRepository::delete,
                     () -> {
                         throw new IllegalArgumentException("You are not in this channel.");
                     }
@@ -62,7 +62,7 @@ public class ChannelServiceImpl implements ChannelService {
         }
 
         // 대상이 매니저인 경우, 채널 매니저 변경
-        List<UserChannel> userChannelList = userChannelRepository.findTop2ByChannelIdOrderByCreatedDateAsc(channelId);
+        List<UserChannel> userChannelList = userChannelJpaRepository.findTop2ByChannelIdOrderByCreatedDateAsc(channelId);
         // list의 size가 2이상인 경우 진행 아니면 exception
         if (userChannelList.size() < 2) {
             throw new IllegalArgumentException("There is no user to be a manager.");
@@ -72,8 +72,8 @@ public class ChannelServiceImpl implements ChannelService {
         channelRepository.save(channel);
 
         // 이후 대상의 UserChannel 삭제
-        UserChannel deleteUserChannel = userChannelRepository.findByUserIdAndChannelId(user.getId(), channelId).orElseThrow();
-        userChannelRepository.delete(deleteUserChannel);
+        UserChannel deleteUserChannel = userChannelJpaRepository.findByUserIdAndChannelId(user.getId(), channelId).orElseThrow();
+        userChannelJpaRepository.delete(deleteUserChannel);
     }
 
     @Override
@@ -88,17 +88,17 @@ public class ChannelServiceImpl implements ChannelService {
         }
 
         // 연관된 UserChannel 및 Channel 삭제
-        userChannelRepository.deleteAllByChannelId(channelId);
+        userChannelJpaRepository.deleteAllByChannelId(channelId);
         channelRepository.delete(channel);
     }
 
     @Override
     public ChannelInfoDto searchChannel(Long channelId) {
         Channel channel = channelRepository.findById(channelId).orElseThrow();
-        List<UserChannel> userChannels = userChannelRepository.findAllByChannelId(channelId);
+        List<UserChannel> userChannels = userChannelJpaRepository.findAllByChannelId(channelId);
         List<User> channelUsers = userChannels.stream().map(UserChannel::getUser).toList();
 
-        UserChannel manager = userChannelRepository.findByUserIdAndChannelId(channel.getManager().getId(), channelId).orElseThrow();
+        UserChannel manager = userChannelJpaRepository.findByUserIdAndChannelId(channel.getManager().getId(), channelId).orElseThrow();
 
         // 요청한 채널의 정보(채널 이름, 생성일, 매니저 닉네임, 채널 유저 리스트) 반환
         return new ChannelInfoDto(
@@ -134,7 +134,7 @@ public class ChannelServiceImpl implements ChannelService {
         User user = userRepository.findById(userId).orElseThrow();
         Channel channel = channelRepository.findById(channelId).orElseThrow();
 
-        userChannelRepository.save(UserChannel.builder()
+        userChannelJpaRepository.save(UserChannel.builder()
                 .channel(channel)
                 .user(channelJoinRequest.getUser())
                 .nickname(channelJoinRequest.getNickname())
@@ -165,15 +165,15 @@ public class ChannelServiceImpl implements ChannelService {
         // 닉네임 중복 확인 후 변경.
         doubleCheckNicknameThrowException(channelId, nickname);
 
-        UserChannel userChannel = userChannelRepository.findByUserId(userId).orElseThrow();
+        UserChannel userChannel = userChannelJpaRepository.findByUserId(userId).orElseThrow();
         userChannel.updateNickname(nickname);
-        userChannelRepository.save(userChannel);
+        userChannelJpaRepository.save(userChannel);
     }
 
     @Override
     public void doubleCheckNicknameThrowException(Long channelId, String nickname) {
         // 닉네임 중복 시 throw Exception
-        userChannelRepository.findAllByChannelId(channelId).stream()
+        userChannelJpaRepository.findAllByChannelId(channelId).stream()
                 .filter(userChannel -> userChannel.getNickname().equals(nickname))
                 .findAny()
                 .ifPresent(userChannel -> {
