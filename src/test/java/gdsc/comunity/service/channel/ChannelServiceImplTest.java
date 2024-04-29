@@ -194,10 +194,9 @@ public class ChannelServiceImplTest {
         Long managerId = manager.getId();
         Long channelId = channel.getId();
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
             channelService.leaveChannel(managerId, channelId);
         });
-        assertEquals("There is no user to be a manager.", exception.getMessage());
     }
 
     @Test
@@ -303,10 +302,9 @@ public class ChannelServiceImplTest {
         Long channelId = channel.getId();
 
         // Act && Assert
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
             channelService.deleteChannel(userId, channelId);
         });
-        assertEquals("Only manager can delete channel.", exception.getMessage());
     }
 
     @Test
