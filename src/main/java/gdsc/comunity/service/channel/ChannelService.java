@@ -3,8 +3,6 @@ package gdsc.comunity.service.channel;
 import gdsc.comunity.dto.channel.ChannelInfoDto;
 import gdsc.comunity.dto.channel.ChannelJoinRequestDto;
 import gdsc.comunity.entity.channel.Channel;
-import gdsc.comunity.entity.channel.ChannelJoinRequest;
-import gdsc.comunity.entity.user.User;
 
 import java.util.List;
 
@@ -26,4 +24,6 @@ public interface ChannelService {
     void changeNickname(Long userId, Long channelId, String nickname);
 
     void doubleCheckNicknameThrowException(Long channelId, String nickname);
+
+    void checkManagerThrowException(Long userId, Long channelId);
 }

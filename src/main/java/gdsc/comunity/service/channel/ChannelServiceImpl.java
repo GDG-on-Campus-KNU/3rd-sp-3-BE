@@ -5,11 +5,11 @@ import gdsc.comunity.dto.channel.ChannelJoinRequestDto;
 import gdsc.comunity.entity.channel.Channel;
 import gdsc.comunity.entity.channel.ChannelJoinRequest;
 import gdsc.comunity.entity.user.User;
-import gdsc.comunity.entity.user.UserChannel;
+import gdsc.comunity.entity.userchannel.UserChannel;
 import gdsc.comunity.repository.channel.ChannelJoinRequestRepository;
 import gdsc.comunity.repository.channel.ChannelRepository;
-import gdsc.comunity.repository.user.UserChannelJpaRepository;
 import gdsc.comunity.repository.user.UserRepository;
+import gdsc.comunity.repository.userchannel.UserChannelJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -154,10 +154,7 @@ public class ChannelServiceImpl implements ChannelService {
                 () -> new IllegalArgumentException("해당 채널이 존재하지 않습니다.")
         );
 
-        // 채널의 매니저만 채널 가입 요청 승인 가능
-        if (!Objects.equals(channel.getManager().getId(), user.getId())) {
-            throw new IllegalArgumentException("채널 매니저만 채널 가입 요청을 승인할 수 있습니다.");
-        }
+        checkManagerThrowException(userId, channel.getManager().getId());
 
         // 채널 가입 요청을 승인하고 UserChannel에 저장. 이후 ChannelJoinRequest 삭제
         ChannelJoinRequest channelJoinRequest = channelJoinRequestRepository.findByUserIdAndChannelId(targetUserId, channelId).orElseThrow(
@@ -174,12 +171,10 @@ public class ChannelServiceImpl implements ChannelService {
 
     @Override
     public List<ChannelJoinRequestDto> searchJoinRequest(Long userId, Long channelId) {
-        // 채널의 매니저가 이나라면 예외 발생
         Channel channel = channelRepository.findById(channelId).
                 orElseThrow(() -> new IllegalArgumentException("해당 채널이 존재하지 않습니다."));
-        if (!Objects.equals(channel.getManager().getId(), userId)) {
-            throw new IllegalArgumentException("매니저만 채널 가입 요청을 조회할 수 있습니다.");
-        }
+        checkManagerThrowException(userId, channel.getManager().getId());
+
         return channelJoinRequestRepository.findAllByChannelId(channelId).stream().map(
                 channelJoinRequest -> new ChannelJoinRequestDto(
                         channelJoinRequest.getId(),
@@ -211,5 +206,12 @@ public class ChannelServiceImpl implements ChannelService {
                 .ifPresent(userChannel -> {
                     throw new IllegalStateException("이미 사용 중인 닉네임입니다.");
                 });
+    }
+
+    @Override
+    public void checkManagerThrowException(Long userId, Long managerId) {
+        if (!Objects.equals(userId, managerId)) {
+            throw new IllegalArgumentException("해당 채널의 매니저가 아닙니다.");
+        }
     }
 }
