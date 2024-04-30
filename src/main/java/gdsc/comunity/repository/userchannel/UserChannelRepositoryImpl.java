@@ -1,4 +1,4 @@
-package gdsc.comunity.repository.user;
+package gdsc.comunity.repository.userchannel;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;

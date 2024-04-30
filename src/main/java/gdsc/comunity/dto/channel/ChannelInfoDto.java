@@ -1,8 +1,7 @@
 package gdsc.comunity.dto.channel;
 
 import gdsc.comunity.entity.user.User;
-import gdsc.comunity.entity.user.UserChannel;
-import lombok.AllArgsConstructor;
+import gdsc.comunity.entity.userchannel.UserChannel;
 import lombok.Getter;
 
 import java.util.ArrayList;

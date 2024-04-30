@@ -1,7 +1,7 @@
-package gdsc.comunity.repository.user;
+package gdsc.comunity.repository.userchannel;
 
 
-import gdsc.comunity.entity.user.UserChannel;
+import gdsc.comunity.entity.userchannel.UserChannel;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
