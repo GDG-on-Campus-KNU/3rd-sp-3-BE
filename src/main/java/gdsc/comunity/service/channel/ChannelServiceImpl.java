@@ -35,14 +35,16 @@ public class ChannelServiceImpl implements ChannelService {
                 .channelName(channelName)
                 .manager(user)
                 .build();
-        channelRepository.save(newChannel);
 
         UserChannel userChannel = UserChannel.builder()
                 .channel(newChannel)
                 .user(user)
                 .nickname(nickname)
                 .build();
-        userChannelJpaRepository.save(userChannel);
+
+        newChannel.addUserChannel(userChannel);
+        channelRepository.save(newChannel);
+//        userChannelJpaRepository.save(userChannel);
 
         return newChannel;
     }
@@ -61,6 +63,8 @@ public class ChannelServiceImpl implements ChannelService {
             UserChannel userChannel = userChannelJpaRepository.findByUserIdAndChannelId(user.getId(), channelId).orElseThrow(
                     () -> new IllegalStateException("사용자 본인이 해당 채널에 속해있지 않습니다.")
             );
+            channel.removeUserChannel(userChannel);
+            channelRepository.save(channel);
             userChannelJpaRepository.delete(userChannel);
             return;
         }
@@ -71,15 +75,15 @@ public class ChannelServiceImpl implements ChannelService {
         if (userChannelList.size() < 2) {
             throw new IllegalStateException("채널에 다른 사용자가 없어 채널을 탈퇴할 수 없습니다. 채널 삭제를 진행해주세요.");
         }
-        UserChannel newManagerUserChannel = userChannelList.get(1);
-        channel.updateManager(newManagerUserChannel.getUser());
-        channelRepository.save(channel);
 
-        // 이후 대상의 UserChannel 삭제
         UserChannel deleteUserChannel = userChannelJpaRepository.findByUserIdAndChannelId(user.getId(), channelId).orElseThrow(
                 () -> new IllegalArgumentException("해당 사용자가 채널에 속해있지 않습니다.")
         );
         userChannelJpaRepository.delete(deleteUserChannel);
+
+        channel.updateManager(userChannelList.get(1).getUser());
+        channel.removeUserChannel(deleteUserChannel);
+        channelRepository.save(channel);
     }
 
     @Override
