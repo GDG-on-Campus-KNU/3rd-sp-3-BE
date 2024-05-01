@@ -163,15 +163,15 @@ public class ChannelServiceImplTest {
         channelService.approveJoinChannel(manager.getId(), user.getId(), channel.getId());
 
         // Act
-        channelService.leaveChannel(manager.getId(), channel.getId());
+        channelService.leaveChannel(user.getId(), channel.getId());
 
         // Assert
-        Optional<UserChannel> userChannel = userChannelJpaRepository.findByUserIdAndChannelId(manager.getId(), channel.getId());
-        assertTrue(userChannel.isEmpty());
+        Optional<UserChannel> userChannelOptional = userChannelJpaRepository.findByUserIdAndChannelId(user.getId(), channel.getId());
+        assertTrue(userChannelOptional.isEmpty());
 
         Optional<Channel> channelOptional = channelRepository.findById(channel.getId());
         assertTrue(channelOptional.isPresent());
-        assertEquals(user.getId(), channelOptional.get().getManager().getId());
+        assertEquals(manager.getId(), channelOptional.get().getManager().getId());
     }
 
     @Test
