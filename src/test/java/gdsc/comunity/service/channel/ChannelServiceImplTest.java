@@ -35,16 +35,20 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestMethodOrder(MethodOrderer.MethodName.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ChannelServiceImplTest {
+    private final ChannelServiceImpl channelService;
+    private final UserRepository userRepository;
+    private final ChannelRepository channelRepository;
+    private final UserChannelJpaRepository userChannelJpaRepository;
+    private final ChannelJoinRequestRepository channelJoinRequestRepository;
+
     @Autowired
-    private ChannelServiceImpl channelService;
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private ChannelRepository channelRepository;
-    @Autowired
-    private UserChannelJpaRepository userChannelJpaRepository;
-    @Autowired
-    private ChannelJoinRequestRepository channelJoinRequestRepository;
+    public ChannelServiceImplTest(ChannelServiceImpl channelService, UserRepository userRepository, ChannelRepository channelRepository, UserChannelJpaRepository userChannelJpaRepository, ChannelJoinRequestRepository channelJoinRequestRepository) {
+        this.channelService = channelService;
+        this.userRepository = userRepository;
+        this.channelRepository = channelRepository;
+        this.userChannelJpaRepository = userChannelJpaRepository;
+        this.channelJoinRequestRepository = channelJoinRequestRepository;
+    }
 
     @Test
     @DisplayName("채널 생성 성공")
