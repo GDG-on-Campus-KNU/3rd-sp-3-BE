@@ -44,7 +44,6 @@ public class ChannelServiceImpl implements ChannelService {
 
         newChannel.addUserChannel(userChannel);
         channelRepository.save(newChannel);
-//        userChannelJpaRepository.save(userChannel);
 
         return newChannel;
     }
@@ -101,8 +100,6 @@ public class ChannelServiceImpl implements ChannelService {
             throw new IllegalStateException("채널 매니저만 채널을 삭제할 수 있습니다.");
         }
 
-        // 연관된 UserChannel 및 Channel 삭제
-        userChannelJpaRepository.deleteAllByChannelId(channelId);
         channelRepository.delete(channel);
     }
 

@@ -324,6 +324,9 @@ public class ChannelServiceImplTest {
         // Assert
         Optional<Channel> channelOptional = channelRepository.findById(channel.getId());
         assertTrue(channelOptional.isEmpty());
+
+        Optional<UserChannel> userChannelOptional = userChannelJpaRepository.findByUserIdAndChannelId(manager.getId(), channel.getId());
+        assertTrue(userChannelOptional.isEmpty());
     }
 
     @Test
