@@ -28,9 +28,8 @@ public class ChannelServiceImpl implements ChannelService {
     @Override
     @Transactional
     public Channel createChannel(Long userId, String channelName, String nickname) {
-        User user = userRepository.findById(userId).orElseThrow(
-                () -> new IllegalArgumentException("해당 사용자가 존재하지 않습니다.")
-        );
+        User user = findUserByIdThrowException(userId);
+
         Channel newChannel = Channel.builder()
                 .channelName(channelName)
                 .manager(user)
@@ -51,12 +50,9 @@ public class ChannelServiceImpl implements ChannelService {
     @Override
     @Transactional
     public void leaveChannel(Long userId, Long channelId) {
-        User user = userRepository.findById(userId).orElseThrow(
-                () -> new IllegalArgumentException("해당 사용자가 존재하지 않습니다.")
-        );
-        Channel channel = channelRepository.findById(channelId).orElseThrow(
-                () -> new IllegalArgumentException("해당 채널이 존재하지 않습니다.")
-        );
+        User user = findUserByIdThrowException(userId);
+        Channel channel = findChannelByIdThrowException(channelId);
+
         // 대상이 매니저가 아닌 경우, UserChannel 삭제
         if (!(Objects.equals(channel.getManager().getId(), user.getId()))) {
             UserChannel userChannel = userChannelJpaRepository.findByUserIdAndChannelId(user.getId(), channelId).orElseThrow(
@@ -88,14 +84,10 @@ public class ChannelServiceImpl implements ChannelService {
     @Override
     @Transactional
     public void deleteChannel(Long userId, Long channelId) {
-        User user = userRepository.findById(userId).orElseThrow(
-                () -> new IllegalArgumentException("해당 사용자가 존재하지 않습니다.")
-        );
+        User user = findUserByIdThrowException(userId);
+        Channel channel = findChannelByIdThrowException(channelId);
 
         // 채널 매니저만 채널 삭제 가능
-        Channel channel = channelRepository.findById(channelId).orElseThrow(
-                () -> new IllegalArgumentException("해당 채널이 존재하지 않습니다.")
-        );
         if (!(Objects.equals(channel.getManager().getId(), user.getId()))) {
             throw new IllegalStateException("채널 매니저만 채널을 삭제할 수 있습니다.");
         }
@@ -105,9 +97,7 @@ public class ChannelServiceImpl implements ChannelService {
 
     @Override
     public ChannelInfoDto searchChannel(Long channelId) {
-        Channel channel = channelRepository.findById(channelId).orElseThrow(
-                () -> new IllegalArgumentException("해당 채널이 존재하지 않습니다.")
-        );
+        Channel channel = findChannelByIdThrowException(channelId);
         List<UserChannel> userChannels = userChannelJpaRepository.findAllByChannelId(channelId);
         List<User> channelUsers = userChannels.stream().map(UserChannel::getUser).toList();
 
@@ -129,14 +119,9 @@ public class ChannelServiceImpl implements ChannelService {
     public void sendJoinRequest(String nickname, Long userId, Long channelId) {
         doubleCheckNicknameThrowException(channelId, nickname);
 
-        User user = userRepository.findById(userId).orElseThrow(
-                () -> new IllegalArgumentException("해당 사용자가 존재하지 않습니다.")
-        );
-        Channel channel = channelRepository.findById(channelId).orElseThrow(
-                () -> new IllegalArgumentException("해당 채널이 존재하지 않습니다.")
-        );
+        User user = findUserByIdThrowException(userId);
+        Channel channel = findChannelByIdThrowException(channelId);
 
-        // 사용자에 대한 채널 가입 요청 저장
         channelJoinRequestRepository.save(ChannelJoinRequest
                 .builder()
                 .channel(channel)
@@ -148,12 +133,8 @@ public class ChannelServiceImpl implements ChannelService {
     @Override
     @Transactional
     public void approveJoinChannel(Long userId, Long targetUserId, Long channelId) {
-        User user = userRepository.findById(userId).orElseThrow(
-                () -> new IllegalArgumentException("해당 사용자가 존재하지 않습니다.")
-        );
-        Channel channel = channelRepository.findById(channelId).orElseThrow(
-                () -> new IllegalArgumentException("해당 채널이 존재하지 않습니다.")
-        );
+        User user = findUserByIdThrowException(userId);
+        Channel channel = findChannelByIdThrowException(channelId);
 
         checkManagerThrowException(userId, channel.getManager().getId());
 
@@ -172,8 +153,7 @@ public class ChannelServiceImpl implements ChannelService {
 
     @Override
     public List<ChannelJoinRequestDto> searchJoinRequest(Long userId, Long channelId) {
-        Channel channel = channelRepository.findById(channelId).
-                orElseThrow(() -> new IllegalArgumentException("해당 채널이 존재하지 않습니다."));
+        Channel channel = findChannelByIdThrowException(channelId);
         checkManagerThrowException(userId, channel.getManager().getId());
 
         return channelJoinRequestRepository.findAllByChannelId(channelId).stream().map(
@@ -214,5 +194,15 @@ public class ChannelServiceImpl implements ChannelService {
         if (!Objects.equals(userId, managerId)) {
             throw new IllegalArgumentException("해당 채널의 매니저가 아닙니다.");
         }
+    }
+
+    @Override
+    public User findUserByIdThrowException(Long userId) {
+        return userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("해당 사용자가 존재하지 않습니다."));
+    }
+
+    @Override
+    public Channel findChannelByIdThrowException(Long channelId) {
+        return channelRepository.findById(channelId).orElseThrow(() -> new IllegalArgumentException("해당 채널이 존재하지 않습니다."));
     }
 }
