@@ -1,11 +1,11 @@
 package gdsc.comunity.service;
 
-import gdsc.comunity.dto.chat.PagingChatting;
 import gdsc.comunity.dto.chat.Chatting;
+import gdsc.comunity.dto.chat.PagingChatting;
 import gdsc.comunity.entity.chat.ChatLog;
 import gdsc.comunity.repository.channel.ChannelRepository;
 import gdsc.comunity.repository.chat.ChatRepository;
-import gdsc.comunity.repository.user.UserChannelRepository;
+import gdsc.comunity.repository.userchannel.UserChannelRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.scheduling.annotation.Async;

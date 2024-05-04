@@ -1,4 +1,4 @@
-package gdsc.comunity.repository.user;
+package gdsc.comunity.repository.userchannel;
 
 import java.util.Map;
 

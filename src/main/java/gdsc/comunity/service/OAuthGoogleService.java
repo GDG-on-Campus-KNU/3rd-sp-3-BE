@@ -1,6 +1,5 @@
 package gdsc.comunity.service;
 
-import gdsc.comunity.dto.GoogleUserInfo;
 import gdsc.comunity.dto.JwtTokensDto;
 import gdsc.comunity.entity.user.Provider;
 import gdsc.comunity.entity.user.User;

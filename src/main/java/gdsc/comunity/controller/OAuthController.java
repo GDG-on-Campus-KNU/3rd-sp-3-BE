@@ -1,6 +1,5 @@
 package gdsc.comunity.controller;
 
-import gdsc.comunity.dto.GoogleUserInfo;
 import gdsc.comunity.dto.JwtTokensDto;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;

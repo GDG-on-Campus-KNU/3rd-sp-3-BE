@@ -2,11 +2,9 @@ package gdsc.comunity.dto.chat;
 
 import gdsc.comunity.entity.channel.Channel;
 import gdsc.comunity.entity.chat.ChatLog;
-import lombok.AllArgsConstructor;
 
 import java.time.LocalDateTime;
 
-@AllArgsConstructor
 public class Chatting {
     public final String message;
     public final String senderNickname;
@@ -19,5 +17,11 @@ public class Chatting {
                 .channel(channel)
                 .sendTime(time)
                 .build();
+    }
+
+    public Chatting(String message, String senderNickname, LocalDateTime time) {
+        this.message = message;
+        this.senderNickname = senderNickname;
+        this.time = time;
     }
 }
