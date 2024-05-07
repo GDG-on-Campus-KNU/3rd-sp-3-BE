@@ -1,0 +1,40 @@
+name: Java CI with Gradle
+
+on:
+  #  after merge to main with pr
+  pull_request:
+    types: [ opened, synchronize, reopened ]
+    branches: [ "develop" ]
+
+jobs:
+  test:
+    runs-on: ubuntu-22.04
+    services:
+      redis:
+        image: redis:latest
+        ports:
+          - 6379:6379
+
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3.1.0
+
+      - name: Test with Gradle Wrapper
+        run: ./gradlew test
+        env:
+          REDIS_HOST: ${{ secrets.REDIS_HOST }}
+          REDIS_PORT: ${{ secrets.REDIS_PORT }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          GOOGLE_REDIRECT_URI: ${{ secrets.GOOGLE_REDIRECT_URI }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
