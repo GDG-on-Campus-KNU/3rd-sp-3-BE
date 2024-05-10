@@ -18,7 +18,8 @@ public class PagingChatting {
     public static PagingChatting of(Page<ChatLog> chatLogPage, Map<Long, String> nicknameMap) {
         List<ChatLog> chatLogList = chatLogPage.getContent();
         List<Chatting> chattingList = chatLogList.stream()
-                .map(chatLog -> new Chatting(chatLog.getContent(), nicknameMap.get(chatLog.getSenderId()), chatLog.getSendTime()))
+                .map(chatLog -> new Chatting(chatLog.getContent(), nicknameMap.get(chatLog.getSenderId()),
+                        chatLog.getType(), chatLog.getSendTime()))
                 .toList();
 
         return new PagingChatting(chatLogPage.hasNext(), chattingList);

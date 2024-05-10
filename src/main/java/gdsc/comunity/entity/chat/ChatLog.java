@@ -24,6 +24,9 @@ public class ChatLog extends BaseTimeEntity {
     @Column(nullable = false)
     private Long senderId;
 
+    @Column(nullable = false)
+    private ChatType type;
+
     @Column(nullable = false, length = 1000)
     private String content;
 
@@ -35,8 +38,9 @@ public class ChatLog extends BaseTimeEntity {
     private LocalDateTime sendTime;
 
     @Builder
-    public ChatLog(Long senderId, String content, Channel channel, LocalDateTime sendTime) {
+    public ChatLog(Long senderId, ChatType type, String content, Channel channel, LocalDateTime sendTime) {
         this.senderId = senderId;
+        this.type = type;
         this.content = content;
         this.channel = channel;
         this.sendTime = sendTime;
