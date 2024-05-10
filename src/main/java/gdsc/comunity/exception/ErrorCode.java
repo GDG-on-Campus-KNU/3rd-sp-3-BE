@@ -15,7 +15,12 @@ public enum ErrorCode {
     INVALID_TOKEN_PREFIX_ERROR(40104, HttpStatus.UNAUTHORIZED, "토큰의 prefix가 올바르지 않습니다"),
 
     //403
-    OAUTH_SERVER_ERROR(40300, HttpStatus.BAD_GATEWAY, "OAuth 서버 에러입니다.");
+    OAUTH_SERVER_ERROR(40300, HttpStatus.BAD_GATEWAY, "OAuth 서버 에러입니다."),
+
+    //500
+    FILE_UPLOAD_ERROR(50000, HttpStatus.INTERNAL_SERVER_ERROR, "파일 업로드 중 에러가 발생했습니다."),
+    FILE_DOWNLOAD_ERROR(50001, HttpStatus.INTERNAL_SERVER_ERROR, "파일 다운로드 중 에러가 발생했습니다."),
+    FILE_TRANSFORM_ERROR(50002, HttpStatus.INTERNAL_SERVER_ERROR, "파일 변환 중 에러가 발생했습니다.");
 
     private final int code;
     private final HttpStatus status;
