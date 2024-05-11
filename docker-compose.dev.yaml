@@ -1,0 +1,15 @@
+version: '3'
+services:
+  gradingx-redis:
+    image: redis:latest
+    container_name: redis
+    hostname: redis
+    expose:
+      - "6379"
+
+  gradingx-server:
+    image: REPLACE_IMAGE_TAG
+    ports:
+      - "8080:8080"
+    depends_on:
+      - gradingx-redis
