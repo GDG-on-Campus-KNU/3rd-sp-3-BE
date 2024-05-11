@@ -1,4 +1,4 @@
-name: Java CI with Gradle
+name: SpringBoot deploy with Docker
 
 on:
   #  after merge to main with pr
@@ -63,7 +63,7 @@ jobs:
           script: |
             cd /home/${{ secrets.REMOTE_USERNAME }}/gdsc-project/script
             chmod +x deploy.sh
-            ./deploy.sh
+            sudo ./deploy.sh
 
   dependency-submission:
     runs-on: ubuntu-latest
