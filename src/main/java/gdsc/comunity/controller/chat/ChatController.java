@@ -1,5 +1,6 @@
 package gdsc.comunity.controller.chat;
 
+import gdsc.comunity.dto.chat.ChatStateDto;
 import gdsc.comunity.dto.chat.Chatting;
 import gdsc.comunity.dto.chat.PagingChatting;
 import gdsc.comunity.exception.CustomException;
@@ -22,22 +23,15 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api/chat")
 public class ChatController {
     private final SimpMessageSendingOperations messagingTemplate;
     private final ChatService chatService;
 
-    @MessageMapping("/{channelId}/{userNickname}/enter")
-    public void enter(@DestinationVariable Long channelId,
-                      @DestinationVariable String userNickname){
+    @MessageMapping("/{channelId}/state")
+    public void connection(ChatStateDto chatStateDto, @DestinationVariable Long channelId){
         messagingTemplate.convertAndSend("/api/sub/" + channelId
-                , userNickname);
-    }
-
-    @MessageMapping("/{channelId}/{userNickname}/exit")
-    public void exit(@DestinationVariable Long channelId,
-                     @DestinationVariable String userNickname){
-        messagingTemplate.convertAndSend("/api/sub/" + channelId
-                , userNickname);
+                , chatStateDto);
     }
 
     @MessageMapping("/{channelId}")
@@ -48,17 +42,19 @@ public class ChatController {
     }
 
     @PostMapping("/{channelId}/{userNickname}/file")
-    public void chatFileUpload(@PathVariable Long channelId, @PathVariable String userNickname, @RequestParam("file") MultipartFile file) {
+    public ResponseEntity<Void> chatFileUpload(@PathVariable Long channelId, @PathVariable String userNickname, @RequestParam("file") MultipartFile file) {
         Chatting chatting = chatService.saveChatFile(channelId, userNickname, file);
         messagingTemplate.convertAndSend("/api/sub/" + channelId
                 , chatting);
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/{channelId}/{userNickname}/image")
-    public void chatImageUpload(@PathVariable Long channelId, @PathVariable String userNickname, @RequestParam("image") MultipartFile[] images) {
+    public ResponseEntity<Void> chatImageUpload(@PathVariable Long channelId, @PathVariable String userNickname, @RequestParam("images") MultipartFile[] images) {
         Chatting chatting = chatService.saveChatImage(channelId, userNickname, images);
         messagingTemplate.convertAndSend("/api/sub/" + channelId
                 , chatting);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/file/{fileCode}")
