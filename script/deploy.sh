@@ -4,4 +4,4 @@ cd ..
 
 docker-compose -f docker-compose.dev.yaml up --build -d
 
-docker-compose ps
+docker-compose -f docker-compose.dev.yaml ps

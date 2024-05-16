@@ -1,7 +1,6 @@
-name: Java CI with Gradle
+name: SpringBoot test with Redis
 
 on:
-  #  after merge to main with pr
   pull_request:
     types: [ opened, synchronize, reopened ]
     branches: [ "develop" ]
