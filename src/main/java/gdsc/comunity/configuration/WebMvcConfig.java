@@ -1,4 +1,4 @@
-package gdsc.comunity.interceptor.config;
+package gdsc.comunity.configuration;
 
 import gdsc.comunity.interceptor.UserIdArgumentResolver;
 import gdsc.comunity.interceptor.UserIdInterceptor;

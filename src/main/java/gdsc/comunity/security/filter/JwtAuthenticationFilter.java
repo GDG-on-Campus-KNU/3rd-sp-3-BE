@@ -5,6 +5,7 @@ import gdsc.comunity.exception.ErrorCode;
 import gdsc.comunity.security.info.UserPrincipal;
 import gdsc.comunity.security.jwt.JwtProvider;
 import gdsc.comunity.security.jwt.JwtVO;
+import gdsc.comunity.util.HeaderUtil;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -26,18 +27,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        String bearerToken = request.getHeader(JwtVO.HEADER);
+        String accessToken = HeaderUtil.extractToken(request, JwtVO.HEADER, JwtVO.TOKEN_PREFIX);
 
-        if (bearerToken == null) {
+        if (accessToken == null) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        if (!bearerToken.startsWith(JwtVO.TOKEN_PREFIX)) {
-            throw new CustomException(ErrorCode.INVALID_TOKEN_PREFIX_ERROR);
-        }
-
-        String accessToken = bearerToken.substring(7);
         Claims claims;
         try {
             claims = jwtProvider.validateToken(accessToken);
