@@ -7,8 +7,6 @@ import gdsc.comunity.exception.CustomException;
 import gdsc.comunity.exception.ErrorCode;
 import gdsc.comunity.service.ChatService;
 import java.io.File;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
@@ -23,7 +21,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/chat")
 public class ChatController {
     private final SimpMessageSendingOperations messagingTemplate;
     private final ChatService chatService;
@@ -41,7 +38,7 @@ public class ChatController {
                 , chatting);
     }
 
-    @PostMapping("/{channelId}/{userNickname}/file")
+    @PostMapping("/api/chat/{channelId}/{userNickname}/file")
     public ResponseEntity<Void> chatFileUpload(@PathVariable Long channelId, @PathVariable String userNickname, @RequestParam("file") MultipartFile file) {
         Chatting chatting = chatService.saveChatFile(channelId, userNickname, file);
         messagingTemplate.convertAndSend("/api/sub/" + channelId
@@ -49,7 +46,7 @@ public class ChatController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/{channelId}/{userNickname}/image")
+    @PostMapping("/api/chat/{channelId}/{userNickname}/image")
     public ResponseEntity<Void> chatImageUpload(@PathVariable Long channelId, @PathVariable String userNickname, @RequestParam("images") MultipartFile[] images) {
         Chatting chatting = chatService.saveChatImage(channelId, userNickname, images);
         messagingTemplate.convertAndSend("/api/sub/" + channelId
@@ -57,29 +54,25 @@ public class ChatController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/file/{fileCode}")
+    @GetMapping("/api/chat/file/{fileCode}")
     public ResponseEntity<ByteArrayResource> chatFileDownload(@PathVariable String fileCode) {
         try {
             File file = chatService.getChatFile(fileCode);
             byte[] fileData = Files.readAllBytes(file.toPath());
-            String encodedFileName = URLEncoder.encode(file.getName(), StandardCharsets.UTF_8);
-
             ByteArrayResource resource = new ByteArrayResource(fileData);
 
-            ResponseEntity<ByteArrayResource> responseEntity = ResponseEntity.ok()
-                .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + encodedFileName + "\"")
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+
+            return ResponseEntity.ok()
+                .headers(headers)
                 .body(resource);
-
-            file.delete();
-
-            return responseEntity;
         } catch (Exception e) {
             throw new CustomException(ErrorCode.FILE_DOWNLOAD_ERROR);
         }
     }
 
-    @GetMapping("/api/chatLog/{channelId}")
+    @GetMapping("/api/chat/chatLog/{channelId}")
     public ResponseEntity<PagingChatting> getChatLog(@PathVariable Long channelId,
                                                      @RequestParam int page){
         return ResponseEntity.ok(chatService.getChatLog(channelId, page));
