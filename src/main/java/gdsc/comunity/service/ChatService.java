@@ -45,9 +45,9 @@ public class ChatService {
     }
 
     public Chatting saveChatFile(Long channelId, String userNickname, MultipartFile file) {
-        String s3filename = s3FileService.uploadFile(file);
+        String uuid = s3FileService.uploadFile(file);
 
-        String message = s3filename + "/" + file.getSize();
+        String message = uuid + "/" + file.getOriginalFilename() + "/" + file.getSize();
 
         Chatting chatting = new Chatting(message, userNickname, ChatType.FILE, LocalDateTime.now());
 
@@ -60,9 +60,9 @@ public class ChatService {
         StringBuilder message = new StringBuilder();
         for (MultipartFile image : images) {
             String url = s3FileService.uploadImage(image);
-            message.append(url).append("/")
-                .append(image.getOriginalFilename()).append("/")
-                .append(image.getSize()).append(";");
+            message.append(url).append(" ")
+                .append(image.getOriginalFilename()).append(" ")
+                .append(image.getSize()).append("/");
         }
 
         Chatting chatting = new Chatting(message.toString(), userNickname, ChatType.IMAGE, LocalDateTime.now());
