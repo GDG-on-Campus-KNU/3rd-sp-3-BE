@@ -1,0 +1,22 @@
+version: '3'
+services:
+  gradingx-redis:
+    image: redis:latest
+    container_name: redis
+    hostname: redis
+    expose:
+      - "6379"
+
+  gradingx-server:
+    image: REPLACE_IMAGE_TAG
+    environment:
+        - REDIS_HOST=localhost
+        - REDIS_PORT=6379
+        - GOOGLE_CLIENT_ID=REPLACE_GOOGLE_CLIENT_ID
+        - GOOGLE_CLIENT_SECRET=REPLACE_GOOGLE_CLIENT_SECRET
+        - GOOGLE_REDIRECT_URI=REPLACE_GOOGLE_REDIRECT_URI
+        - JWT_SECRET=REPLACE_JWT_SECRET
+    ports:
+      - "8080:8080"
+    depends_on:
+      - gradingx-redis
