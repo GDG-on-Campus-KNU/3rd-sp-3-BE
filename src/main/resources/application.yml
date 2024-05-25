@@ -35,10 +35,19 @@ spring:
             client-secret: ${GOOGLE_CLIENT_SECRET}
             redirect-uri: ${GOOGLE_REDIRECT_URI}
 
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+
 logging.level:
   org.hibernate:
     orm.jdbc.bind: trace
     SQL: debug
+
+aws:
+  access-key: ${S3_ACCESS_KEY}
+  secret-key: ${S3_PRIVATE_KEY}
 
 jwt:
   secret: "${JWT_SECRET}"
