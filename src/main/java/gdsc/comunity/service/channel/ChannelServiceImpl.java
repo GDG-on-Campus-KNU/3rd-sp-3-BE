@@ -132,16 +132,15 @@ public class ChannelServiceImpl implements ChannelService {
 
     @Override
     @Transactional
-    public void approveJoinChannel(Long userId, Long targetUserId, Long channelId) {
-        User user = findUserByIdThrowException(userId);
-        Channel channel = findChannelByIdThrowException(channelId);
-
-        checkManagerThrowException(userId, channel.getManager().getId());
-
+    public void approveJoinChannel(Long userId, Long requestId) {
         // 채널 가입 요청을 승인하고 UserChannel에 저장. 이후 ChannelJoinRequest 삭제
-        ChannelJoinRequest channelJoinRequest = channelJoinRequestRepository.findByUserIdAndChannelId(targetUserId, channelId).orElseThrow(
+        User user = findUserByIdThrowException(userId);
+        ChannelJoinRequest channelJoinRequest = channelJoinRequestRepository.findById(requestId).orElseThrow(
                 () -> new IllegalArgumentException("해당 사용자의 채널 가입 요청이 존재하지 않습니다.")
         );
+        Channel channel = channelJoinRequest.getChannel();
+
+        checkManagerThrowException(userId, channel.getManager().getId());
 
         userChannelJpaRepository.save(UserChannel.builder()
                 .channel(channel)
