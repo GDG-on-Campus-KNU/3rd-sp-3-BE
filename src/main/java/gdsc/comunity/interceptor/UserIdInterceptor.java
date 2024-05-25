@@ -17,11 +17,12 @@ public class UserIdInterceptor implements HandlerInterceptor {
             HttpServletResponse response,
             Object handler
     ) throws Exception {
-        UserPrincipal userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        //request객체에 UserId 값 추가
-        request.setAttribute("userId", userPrincipal.getId());
-
-        return HandlerInterceptor.super.preHandle(request, response, handler);
+//        UserPrincipal userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//
+//        //request객체에 UserId 값 추가
+//        request.setAttribute("userId", userPrincipal.getId());
+//
+//        return HandlerInterceptor.super.preHandle(request, response, handler);
+        return true;
     }
 }
