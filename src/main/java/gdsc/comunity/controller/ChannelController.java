@@ -55,11 +55,9 @@ public class ChannelController {
         return new ResponseEntity<>("Channel deleted.", HttpStatus.OK);
     }
 
-    @PutMapping("/approve")
-    ResponseEntity<String> approveJoinChannel(@RequestBody ApproveJoinChannelDto approveJoinChannelDto, @UserId Long userId) {
-        Long targetUserId = approveJoinChannelDto.getUserId();
-        Long channelId = approveJoinChannelDto.getChannelId();
-        channelServiceImpl.approveJoinChannel(userId, targetUserId, channelId);
+    @PutMapping("/join-requests/{requestId}")
+    ResponseEntity<String> approveJoinChannel(@PathVariable Long requestId, @UserId Long userId) {
+        channelServiceImpl.approveJoinChannel(userId, requestId);
         return new ResponseEntity<>("Channel joined.", HttpStatus.OK);
     }
 

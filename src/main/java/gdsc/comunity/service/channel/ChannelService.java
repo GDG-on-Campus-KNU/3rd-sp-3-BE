@@ -16,7 +16,7 @@ public interface ChannelService {
 
     ChannelInfoDto searchChannel(Long channelId);
 
-    void approveJoinChannel(Long userId, Long targetUserId, Long channelId);
+    void approveJoinChannel(Long userId, Long requestId);
 
     void sendJoinRequest(String nickname, Long userId, Long channelId);
 

@@ -131,8 +131,10 @@ public class ChannelServiceImplTest {
 
         channelService.sendJoinRequest("nickname2", user.getId(), channel.getId());
 
+        Long requestId = channelJoinRequestRepository.findByUserIdAndChannelId(user.getId(), channel.getId()).orElseThrow().getId();
+
         // do
-        channelService.approveJoinChannel(manager.getId(), user.getId(), channel.getId());
+        channelService.approveJoinChannel(manager.getId(), requestId);
 
         // assert result
         Optional<UserChannel> userChannel = userChannelJpaRepository.findByUserIdAndChannelId(user.getId(), channel.getId());
@@ -164,7 +166,8 @@ public class ChannelServiceImplTest {
 
         Channel channel = channelService.createChannel(manager.getId(), "New Channel", "nickname");
         channelService.sendJoinRequest("nickname2", user.getId(), channel.getId());
-        channelService.approveJoinChannel(manager.getId(), user.getId(), channel.getId());
+        Long requestId = channelJoinRequestRepository.findByUserIdAndChannelId(user.getId(), channel.getId()).orElseThrow().getId();
+        channelService.approveJoinChannel(manager.getId(), requestId);
 
         // Act
         channelService.leaveChannel(user.getId(), channel.getId());
@@ -232,8 +235,10 @@ public class ChannelServiceImplTest {
         Channel channel = channelService.createChannel(manager.getId(), "New Channel", "nickname");
         channelService.sendJoinRequest("nickname1", user1.getId(), channel.getId());
         channelService.sendJoinRequest("nickname2", user2.getId(), channel.getId());
-        channelService.approveJoinChannel(manager.getId(), user1.getId(), channel.getId());
-        channelService.approveJoinChannel(manager.getId(), user2.getId(), channel.getId());
+        Long requestId1 = channelJoinRequestRepository.findByUserIdAndChannelId(user1.getId(), channel.getId()).orElseThrow().getId();
+        Long requestId2 = channelJoinRequestRepository.findByUserIdAndChannelId(user2.getId(), channel.getId()).orElseThrow().getId();
+        channelService.approveJoinChannel(manager.getId(), requestId1);
+        channelService.approveJoinChannel(manager.getId(), requestId2);
 
         // Act
         List<UserChannel> listUserChannel = userChannelJpaRepository.findTop2ByChannelIdOrderByCreatedDateAsc(channel.getId());
@@ -264,7 +269,8 @@ public class ChannelServiceImplTest {
 
         Channel channel = channelService.createChannel(manager.getId(), "New Channel", "nickname");
         channelService.sendJoinRequest("nickname2", user.getId(), channel.getId());
-        channelService.approveJoinChannel(manager.getId(), user.getId(), channel.getId());
+        Long requestId = channelJoinRequestRepository.findByUserIdAndChannelId(user.getId(), channel.getId()).orElseThrow().getId();
+        channelService.approveJoinChannel(manager.getId(), requestId);
 
         // Act
         channelService.leaveChannel(manager.getId(), channel.getId());
